@@ -259,6 +259,6 @@ cookie value returned in `Set-Cookie` at login.
 
 ## Documentation maintenance
 
-`apps/api/src/docs/schemas.ts`, `paths.ts`, and `openapi.ts` are the machine-readable source of
+`apps/api/src/docs/schemas/index.ts`, `paths.ts`, and `openapi.ts` are the machine-readable source of
 truth. Update them whenever a route, payload, or error response changes. The integration suite
 checks that every expected path exists and that no schema `$ref` is dangling.

@@ -1,4 +1,4 @@
-import { errorResponses } from './schemas.js';
+import { errorResponses } from './schemas/index.js';
 
 const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` });
 const auth = [{ cookieAuth: [] }, { bearerAuth: [] }];

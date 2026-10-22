@@ -1,5 +1,5 @@
 import { paths } from './paths.js';
-import { schemas, securitySchemes } from './schemas.js';
+import { schemas, securitySchemes } from './schemas/index.js';
 
 export const openApiDocument = {
   openapi: '3.0.3',

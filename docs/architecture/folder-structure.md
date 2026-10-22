@@ -24,7 +24,7 @@ loqta/
 │   │   ├── app.ts                 Express app factory
 │   │   ├── server.ts              Process entry point, migrations, graceful shutdown
 │   │   ├── config/                env.ts, logger.ts, paths.ts
-│   │   ├── docs/                  openapi.ts, paths.ts, schemas.ts
+│   │   ├── docs/                  openapi.ts, paths.ts, schemas/ (components)
 │   │   ├── infrastructure/
 │   │   │   ├── container.ts       Composition root
 │   │   │   ├── database/
