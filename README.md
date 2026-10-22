@@ -23,7 +23,7 @@ phases, in the order documented in the roadmap below.
 
 ## Requirements
 
-- Node.js >= 20.11 (CI uses Node 22)
+- Node.js >= 20.19 (CI uses Node 22)
 - npm >= 10
 
 ## Quick start
@@ -75,7 +75,7 @@ curl.exe http://localhost:3000/api/v1/health
 | `npm run build`        | Clean and compile the API to `apps/api/dist`               |
 | `npm start`            | Run the compiled API                                       |
 | `npm test`             | Run unit and integration tests (Vitest)                    |
-| `npm run test:watch`   | Run tests in watch mode (inside `apps/api`)                |
+| `npm run test:watch`   | Run tests in watch mode                                    |
 | `npm run typecheck`    | TypeScript check without emitting files                    |
 | `npm run lint`         | ESLint across the repository                               |
 | `npm run format`       | Format with Prettier                                       |

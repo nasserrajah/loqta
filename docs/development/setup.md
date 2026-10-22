@@ -4,7 +4,7 @@ This guide covers the Phase 1 backend. Database setup is added in Phase 2.
 
 ## Prerequisites
 
-- Node.js >= 20.11
+- Node.js >= 20.19
 - npm >= 10
 - Git
 
@@ -121,3 +121,12 @@ Implemented and verified:
 - CI workflow and architecture documentation
 
 Not implemented yet: SQLite, migrations, authentication, business modules, OpenAPI/Swagger UI.
+
+## Tooling notes
+
+- Node.js 20.19+ (or 22.12+) is required by ESLint 10 and Vite 7. Running an older Node version
+  produces engine warnings and is not supported.
+- `vitest@4` can resolve Vite 7 or 8. The root `overrides` field pins `vite@7.3.7`, the combination
+  tested here; this also avoids the optional native Rolldown binding issues seen with Vite 8.
+- `npm audit` reports zero vulnerabilities with the committed lockfile. Re-run it after dependency
+  changes.
