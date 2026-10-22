@@ -43,11 +43,17 @@ npm run dev
 The server logs a startup message and listens on `http://localhost:3000` by default. Stop it with
 `Ctrl+C`. The shutdown handler closes the HTTP server gracefully.
 
-If port 3000 is already in use, change `PORT` in `apps/api/.env` or stop the other process:
+If port 3000 is already in use, the server now logs a clear `EADDRINUSE` message and exits with a
+non-zero code instead of crashing with an unhandled error. Only run one instance at a time:
+`npm run dev` and `npm start` both bind the same port. To find and stop the process holding it:
 
 ```powershell
-Get-NetTCPConnection -LocalPort 3000 -State Listen
+$connection = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue
+$connection | Select-Object LocalAddress, LocalPort, OwningProcess
+$connection.OwningProcess | ForEach-Object { Stop-Process -Id $_ }
 ```
+
+Alternatively, change `PORT` in `apps/api/.env` for the second instance.
 
 ## 4. Verify the health endpoint
 
