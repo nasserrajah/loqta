@@ -142,7 +142,7 @@ a clean production build. Individual commands are listed in the root `README.md`
 Tests use an in-memory SQLite database and a temporary bcrypt cost of 4, so they do not touch the
 development database. The suite covers migrations, idempotent seeding, auth and sessions, password
 reset, profile updates, catalog filtering, favorites, cart totals, orders, stock conflicts, admin
-authorization, role changes, and OpenAPI/Swagger.
+authorization, role changes, rate limiting, and OpenAPI/Swagger.
 
 ## 7. Run the compiled server
 
