@@ -1,12 +1,15 @@
 # Local Setup and Verification
 
-This guide covers the Phase 1 backend. Database setup is added in Phase 2.
+This guide covers the complete backend: SQLite, seed data, authentication, catalog, cart, orders,
+administration, and API documentation.
 
 ## Prerequisites
 
-- Node.js >= 20.19
+- Node.js >= 20.19 (Node 22 is recommended and used in CI)
 - npm >= 10
 - Git
+- A C++ build toolchain is **not** normally required: `better-sqlite3` installs a prebuilt binary.
+  If your platform has no prebuild, npm falls back to compiling it.
 
 ## 1. Install dependencies
 
@@ -16,8 +19,8 @@ From the repository root:
 npm install
 ```
 
-npm workspaces installs the root tooling, `@loqta/api`, and `@loqta/shared` together. Use
-`npm ci` instead of `npm install` in CI or when you need an exact install from `package-lock.json`.
+npm workspaces installs the root tooling, `@loqta/api`, and `@loqta/shared` together. Use `npm ci`
+in CI or when you need an exact install from `package-lock.json`.
 
 ## 2. Create the environment file
 
@@ -31,21 +34,44 @@ Copy-Item apps/api/.env.example apps/api/.env
 cp apps/api/.env.example apps/api/.env
 ```
 
-The API reads `.env` from its own workspace directory, which is the working directory used by the
-root npm scripts. Environment variables are validated by Zod on startup.
+The API loads `.env` from both the repository root and `apps/api`. Environment variables are
+validated by Zod on startup. Defaults are sufficient for local work.
 
-## 3. Run the API
+## 3. Create and seed the database
+
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+- Migrations live in `database/migrations` and are applied once each; the runner records versions in
+  `schema_migrations`.
+- The database file defaults to `apps/api/data/loqta.db` (relative to the API package, even if you
+  start the process from the repository root).
+- The seed is idempotent: re-running it does not duplicate users, categories, brands, products, or
+  images. It also does not overwrite edited products; it only inserts rows that are missing.
+- The server also applies pending migrations automatically at startup.
+
+Seeded demo accounts:
+
+| Role     | Email             | Password    |
+| -------- | ----------------- | ----------- |
+| Admin    | `admin@loqta.dev` | `Admin123!` |
+| Customer | `user@loqta.dev`  | `User123!`  |
+
+Seeded catalog: 9 categories, 14 brands, 27 products, 54 placeholder images.
+
+## 4. Run the API
 
 ```bash
 npm run dev
 ```
 
 The server logs a startup message and listens on `http://localhost:3000` by default. Stop it with
-`Ctrl+C`. The shutdown handler closes the HTTP server gracefully.
+`Ctrl+C`; the shutdown handler closes the HTTP server and the database.
 
-If port 3000 is already in use, the server now logs a clear `EADDRINUSE` message and exits with a
-non-zero code instead of crashing with an unhandled error. Only run one instance at a time:
-`npm run dev` and `npm start` both bind the same port. To find and stop the process holding it:
+If port 3000 is already in use, the server logs a clear `EADDRINUSE` message and exits non-zero.
+Only run one instance at a time with the same port. To find and stop the process holding it:
 
 ```powershell
 $connection = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue
@@ -53,15 +79,15 @@ $connection | Select-Object LocalAddress, LocalPort, OwningProcess
 $connection.OwningProcess | ForEach-Object { Stop-Process -Id $_ }
 ```
 
-Alternatively, change `PORT` in `apps/api/.env` for the second instance.
+Alternatively, change `PORT` in `apps/api/.env`.
 
-## 4. Verify the health endpoint
+## 5. Verify the API
+
+Health:
 
 ```bash
 curl.exe http://localhost:3000/api/v1/health
 ```
-
-Expected response (`timestamp` and `uptimeSeconds` vary):
 
 ```json
 {
@@ -73,27 +99,52 @@ Expected response (`timestamp` and `uptimeSeconds` vary):
 }
 ```
 
+Catalog:
+
+```bash
+curl.exe "http://localhost:3000/api/v1/products?pageSize=3"
+curl.exe http://localhost:3000/api/v1/products/iphone-15-pro
+```
+
+Swagger UI: <http://localhost:3000/api/v1/docs>
+
+Log in and call an authenticated route with a cookie jar:
+
+```bash
+curl.exe -c cookies.txt -H "Content-Type: application/json" \
+  -d "{\"email\":\"admin@loqta.dev\",\"password\":\"Admin123!\"}" \
+  http://localhost:3000/api/v1/auth/login
+
+curl.exe -b cookies.txt http://localhost:3000/api/v1/admin/stats
+```
+
 Unknown routes return a consistent error envelope:
 
 ```json
 {
   "error": {
     "code": "NOT_FOUND",
-    "message": "Route GET /api/v1/unknown not found"
+    "message": "Route GET /api/v1/unknown not found",
+    "requestId": "..."
   }
 }
 ```
 
-## 5. Run all checks
+## 6. Run all checks
 
 ```bash
 npm run verify
 ```
 
-`verify` runs, in order: ESLint, Prettier check, TypeScript typecheck, Vitest, and a clean
-production build. Individual commands are listed in the root `README.md`.
+`verify` runs, in order: ESLint, Prettier check, API/typechecks (including the seed CLI), Vitest, and
+a clean production build. Individual commands are listed in the root `README.md`.
 
-## 6. Run the compiled server
+Tests use an in-memory SQLite database and a temporary bcrypt cost of 4, so they do not touch the
+development database. The suite covers migrations, idempotent seeding, auth and sessions, password
+reset, profile updates, catalog filtering, favorites, cart totals, orders, stock conflicts, admin
+authorization, role changes, and OpenAPI/Swagger.
+
+## 7. Run the compiled server
 
 ```bash
 npm run build
@@ -103,36 +154,39 @@ npm start
 The build uses `apps/api/tsconfig.build.json`, so tests and `vitest.config.ts` are not emitted into
 `apps/api/dist`. The compiled entry point is `apps/api/dist/src/server.js`.
 
+## Resetting local data
+
+Stop the server first, then remove the SQLite files and recreate them:
+
+```powershell
+Remove-Item apps/api/data/loqta.db* -Force
+npm run db:migrate
+npm run db:seed
+```
+
+The `-wal` and `-shm` files belong to SQLite's write-ahead log; delete them together with the main
+file.
+
 ## Troubleshooting
 
-| Symptom                             | Fix                                                               |
-| ----------------------------------- | ----------------------------------------------------------------- |
-| `Invalid environment configuration` | Check the variable named in the error and its allowed values.     |
-| `EADDRINUSE`                        | Change `PORT` or stop the process using the port.                 |
-| CORS blocked in a browser           | Add the frontend origin to `CORS_ORIGINS` (comma-separated).      |
-| No colored logs                     | `pino-pretty` is used only when `NODE_ENV=development`.           |
-| Tests hang or log to the console    | Vitest sets `NODE_ENV=test` and `LOG_LEVEL=silent` in its config. |
-
-## Phase 1 scope
-
-Implemented and verified:
-
-- npm workspaces and the fixed folder structure
-- Strict TypeScript with native ESM
-- Express app factory, JSON parsing, Helmet, CORS, Pino request logging
-- Environment validation and fail-fast startup
-- `GET /api/v1/health`
-- Centralized 404 and error handling
-- Unit and integration tests, including a real HTTP server startup test
-- CI workflow and architecture documentation
-
-Not implemented yet: SQLite, migrations, authentication, business modules, OpenAPI/Swagger UI.
+| Symptom                                         | Fix                                                                     |
+| ----------------------------------------------- | ----------------------------------------------------------------------- |
+| `Invalid environment configuration`             | Check the variable named in the error and its allowed values.           |
+| `EADDRINUSE`                                    | Change `PORT` or stop the process using the port.                       |
+| `SQLITE_CANTOPEN` or permission error           | Ensure `apps/api/data` is writable, or set an absolute `DATABASE_PATH`. |
+| Empty catalog after startup                     | Run `npm run db:seed`; migrations alone do not insert products.         |
+| Login succeeds but cookie is not sent over HTTP | Production cookies are `Secure`; use HTTPS or `NODE_ENV=development`.   |
+| CORS blocked in a browser                       | Add the frontend origin to `CORS_ORIGINS` (comma-separated).            |
+| No colored logs                                 | `pino-pretty` is used only when `NODE_ENV=development`.                 |
+| Tests hang or log to the console                | Vitest sets `NODE_ENV=test` and `LOG_LEVEL=silent` in its config.       |
+| `npm install` emits engine warnings             | Use Node 20.19+ or 22; older versions are unsupported.                  |
 
 ## Tooling notes
 
-- Node.js 20.19+ (or 22.12+) is required by ESLint 10 and Vite 7. Running an older Node version
-  produces engine warnings and is not supported.
+- ESLint 10 and Vite 7 require Node 20.19+ or 22.12+.
 - `vitest@4` can resolve Vite 7 or 8. The root `overrides` field pins `vite@7.3.7`, the combination
-  tested here; this also avoids the optional native Rolldown binding issues seen with Vite 8.
-- `npm audit` reports zero vulnerabilities with the committed lockfile. Re-run it after dependency
-  changes.
+  tested here; this also avoids optional Rolldown binding issues seen with Vite 8.
+- `better-sqlite3` is pinned to `11.10.0` because 12.x did not provide a working prebuilt binary for
+  every local Node version at implementation time.
+- `bcryptjs` is pure JavaScript, so password hashing needs no native toolchain.
+- The seed CLI is typechecked by `database/tsconfig.json` and is not part of the production build.

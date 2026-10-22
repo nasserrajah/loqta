@@ -1,13 +1,15 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Server } from 'node:http';
-import { createApp } from '../../src/app.js';
+import { createTestContext, type TestContext } from '../helpers/test-app.js';
 
 describe('HTTP server startup', () => {
   let server: Server;
   let baseUrl: string;
+  let context: TestContext;
 
   beforeAll(async () => {
-    server = createApp().listen(0, '127.0.0.1');
+    context = await createTestContext();
+    server = context.app.listen(0, '127.0.0.1');
     await new Promise<void>((resolve, reject) => {
       server.once('listening', resolve);
       server.once('error', reject);
@@ -24,6 +26,7 @@ describe('HTTP server startup', () => {
     await new Promise<void>((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));
     });
+    await context.close();
   });
 
   it('binds a port and serves the health endpoint over HTTP', async () => {
