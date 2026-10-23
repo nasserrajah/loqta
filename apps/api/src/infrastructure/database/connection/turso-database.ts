@@ -27,7 +27,18 @@ export class TursoDatabaseClient implements DatabaseClient {
   }
 
   async exec(sql: string): Promise<void> {
-    await this.client.execute(sql);
+    // Turso's HTTP client does not support executing multiple statements in a
+    // single execute() call. Split the SQL text into individual statements and
+    // run them sequentially. This is sufficient for our migrations, which are
+    // plain CREATE TABLE / CREATE INDEX statements.
+    const statements = sql
+      .split(';')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0 && !s.startsWith('--') && s !== 'PRAGMA foreign_keys = ON');
+
+    for (const statement of statements) {
+      await this.client.execute(statement);
+    }
   }
 
   async transaction<T>(callback: (tx: DatabaseClient) => Promise<T>): Promise<T> {
