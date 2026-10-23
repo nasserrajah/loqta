@@ -47,11 +47,16 @@ export function createAuthController({
       sendCreated(res, toAuthResponse(result));
     }),
 
-    login: asyncHandler(async (req: Request, res: Response) => {
-      const input = req.validated.body as LoginInput;
-      const result = await authService.login(input, sessionContext(req));
-      setSessionCookie(res, result.token, result.expiresAt, secureCookie);
-      sendData(res, toAuthResponse(result));
+        login: asyncHandler(async (req: Request, res: Response) => {
+      try {
+        const input = req.validated.body as LoginInput;
+        const result = await authService.login(input, sessionContext(req));
+        setSessionCookie(res, result.token, result.expiresAt, secureCookie);
+        sendData(res, toAuthResponse(result));
+      } catch (error) {
+        console.error('🔴 Login error details:', error);
+        throw error; // نعيد رمي الخطأ ليتعامل معه errorHandler
+      }
     }),
 
     logout: asyncHandler(async (req: Request, res: Response) => {
