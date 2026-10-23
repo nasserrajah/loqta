@@ -21,7 +21,8 @@ async function bootstrap(): Promise<void> {
   const container = createContainer({ db, env, logger });
   const app = createApp(container);
 
-  const server = app.listen(env.PORT, () => {
+  // التعديل هنا: ربط الخادم بعنوان 0.0.0.0 ليعمل على Render
+  const server = app.listen(env.PORT, '0.0.0.0', () => {
     logger.info(`Loqta API listening on port ${env.PORT} (${env.NODE_ENV})`);
   });
 
