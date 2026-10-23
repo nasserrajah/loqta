@@ -8,14 +8,19 @@ import { runMigrations } from './infrastructure/database/migrations/index.js';
 
 async function bootstrap(): Promise<void> {
   // استخدام Turso إذا كانت متغيرات البيئة موجودة، وإلا استخدام SQLite المحلي
-  const db =
-    env.TURSO_DATABASE_URL && env.TURSO_AUTH_TOKEN
-      ? createTursoDatabase(env.TURSO_DATABASE_URL, env.TURSO_AUTH_TOKEN)
-      : createSqliteDatabase(resolveFromApiRoot(env.DATABASE_PATH));
+    // استخدام Turso إذا كانت متغيرات البيئة موجودة، وإلا استخدام SQLite المحلي
+  const useTurso = !!(env.TURSO_DATABASE_URL && env.TURSO_AUTH_TOKEN);
+  const db = useTurso
+    ? createTursoDatabase(env.TURSO_DATABASE_URL!, env.TURSO_AUTH_TOKEN!)
+    : createSqliteDatabase(resolveFromApiRoot(env.DATABASE_PATH));
 
-  const applied = await runMigrations(db);
-  if (applied.length > 0) {
-    logger.info({ applied }, `Applied ${applied.length} database migration(s)`);
+  // Turso (libSQL) لا يدعم تنفيذ ملفات SQL متعددة الأوامر عبر HTTP.
+  // يتم إنشاء الجداول يدوياً مرة واحدة فقط عند إعداد قاعدة البيانات.
+  if (!useTurso) {
+    const applied = await runMigrations(db);
+    if (applied.length > 0) {
+      logger.info({ applied }, `Applied ${applied.length} database migration(s)`);
+    }
   }
 
   const container = createContainer({ db, env, logger });
