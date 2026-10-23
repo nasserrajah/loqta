@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "loqta-api" generated at 2026-10-22T21:57:35.501Z.

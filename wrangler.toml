@@ -1,0 +1,23 @@
+name = "loqta-api"
+main = "apps/api/src/worker.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat_v2"]
+
+# D1 database binding (created earlier)
+[[d1_databases]]
+binding = "DB"
+database_name = "loqta-db"
+database_id = "8ead1788-aa63-41aa-a59b-9b929bd8bc2e"
+
+# Non-secret environment variables
+[vars]
+NODE_ENV = "production"
+LOG_LEVEL = "info"
+APP_URL = "https://loqta-api.workers.dev"
+CORS_ORIGINS = "https://example.com"
+TRUST_PROXY = "true"
+
+# Secrets should be set via: wrangler secret put <NAME>
+# (This project uses session cookies, no JWT secret needed.)
+[alias]
+"iconv-lite" = "./apps/api/src/shims/iconv-lite.cjs"

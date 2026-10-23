@@ -1,7 +1,10 @@
 import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import Database from 'better-sqlite3';
+import { createRequire } from 'node:module';
+import type DatabaseType from 'better-sqlite3';
 import type { DatabaseClient, DatabaseRunResult, SqlValue } from './database-client.js';
+
+const require = createRequire(import.meta.url);
 
 class ScopedSqliteClient implements DatabaseClient {
   constructor(private readonly owner: SqliteDatabaseClient) {}
@@ -39,7 +42,7 @@ class ScopedSqliteClient implements DatabaseClient {
  * async contract deterministic while the underlying driver remains synchronous.
  */
 export class SqliteDatabaseClient implements DatabaseClient {
-  private readonly db: Database.Database;
+  private readonly db: DatabaseType.Database;
   private readonly scoped: ScopedSqliteClient;
   private queue: Promise<unknown> = Promise.resolve();
 
@@ -51,7 +54,11 @@ export class SqliteDatabaseClient implements DatabaseClient {
       mkdirSync(dirname(resolvedPath), { recursive: true });
     }
 
-    this.db = new Database(resolvedPath);
+    // Use dynamic require so that better-sqlite3 is not loaded in environments
+    // where it is unavailable (e.g., Render with Turso).
+    const BetterSqlite3 = require('better-sqlite3');
+    this.db = new BetterSqlite3(resolvedPath);
+    
     this.db.pragma('foreign_keys = ON');
     this.db.pragma('busy_timeout = 5000');
     if (!isMemory) {

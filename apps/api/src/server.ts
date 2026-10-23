@@ -3,11 +3,16 @@ import { env } from './config/env.js';
 import { logger } from './config/logger.js';
 import { resolveFromApiRoot } from './config/paths.js';
 import { createContainer } from './infrastructure/container.js';
-import { createSqliteDatabase } from './infrastructure/database/connection/index.js';
+import { createSqliteDatabase, createTursoDatabase } from './infrastructure/database/connection/index.js';
 import { runMigrations } from './infrastructure/database/migrations/index.js';
 
 async function bootstrap(): Promise<void> {
-  const db = createSqliteDatabase(resolveFromApiRoot(env.DATABASE_PATH));
+  // استخدام Turso إذا كانت متغيرات البيئة موجودة، وإلا استخدام SQLite المحلي
+  const db =
+    env.TURSO_DATABASE_URL && env.TURSO_AUTH_TOKEN
+      ? createTursoDatabase(env.TURSO_DATABASE_URL, env.TURSO_AUTH_TOKEN)
+      : createSqliteDatabase(resolveFromApiRoot(env.DATABASE_PATH));
+
   const applied = await runMigrations(db);
   if (applied.length > 0) {
     logger.info({ applied }, `Applied ${applied.length} database migration(s)`);

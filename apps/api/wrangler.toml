@@ -1,0 +1,9 @@
+name = "loqta-api"
+main = "apps/api/src/worker.ts"   # سيُنشأ لاحقًا
+compatibility_date = "2026-10-01"  # تاريخ حديث يدعم node:http
+compatibility_flags = ["nodejs_compat_v2"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "loqta-db"
+database_id = "ضع-هنا-الـ-ID-الذي-حصلت-عليه"

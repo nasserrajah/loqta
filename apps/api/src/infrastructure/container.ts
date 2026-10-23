@@ -1,6 +1,5 @@
 import type { Logger } from 'pino';
 import type { Env } from '../config/env.js';
-import { logger as defaultLogger } from '../config/logger.js';
 import { ConsoleEmailSender, type EmailSender } from './email/index.js';
 import { BcryptPasswordHasher, type PasswordHasher } from './security/index.js';
 import {
@@ -75,13 +74,27 @@ export interface CreateContainerOptions {
 }
 
 /**
+ * Minimal logger used when no logger is provided. The Node entrypoint injects
+ * a pino logger; the Workers entrypoint injects a console-based logger.
+ */
+const fallbackLogger = {
+  info: (...args: unknown[]) => console.info(...args),
+  error: (...args: unknown[]) => console.error(...args),
+  warn: (...args: unknown[]) => console.warn(...args),
+  debug: (...args: unknown[]) => console.debug(...args),
+  trace: (...args: unknown[]) => console.trace(...args),
+  fatal: (...args: unknown[]) => console.error(...args),
+  child: () => fallbackLogger,
+} as unknown as Logger;
+
+/**
  * Composition root. Domain services receive interfaces, never the SQLite driver,
  * so a D1 adapter can replace the local database without touching the modules.
  */
 export function createContainer({
   db,
   env,
-  logger = defaultLogger,
+  logger = fallbackLogger,
 }: CreateContainerOptions): Container {
   const repositories: Repositories = {
     users: new SqliteUserRepository(db),
