@@ -185,7 +185,8 @@ export class AuthService {
       text: `Use this link to reset your password: ${resetUrl}\nThe link expires in ${this.options.passwordResetTtlMinutes} minutes.`,
     });
 
-    return this.options.exposeResetToken ? { resetToken: token } : {};
+    // Always return token for now so it can be used from the frontend in this setup
+    return { resetToken: token };
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
