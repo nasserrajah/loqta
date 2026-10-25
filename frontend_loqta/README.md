@@ -115,6 +115,15 @@ while the card is near the viewport and fades in once the model is framed.
 Only real product photos are displayed otherwise — generated placeholder
 images are never shown.
 
+**Storefront 3D extra:**
+
+- The hero shows the animated shopping basket
+  `public/models/cover_basket/loqta-cart-1.gltf` (drag to rotate, reset button).
+- The "Get up to 70% off" row renders four more real models from
+  `public/models/`: `samsung_galaxy_s21_ultra`, `playstation_ps5`,
+  `rotom_game_boy` and `camers1` (DJI FPV drone), each with a discount badge.
+  These mount only when the row scrolls into view (the drone bundle is 16 MB).
+
 ---
 
 ## Deployment (Cloudflare Pages)

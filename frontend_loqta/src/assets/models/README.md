@@ -16,6 +16,16 @@ demo products in `src/data/modelRegistry.ts`:
 | Sony Alpha Camera | `camera` |
 | PlayStation 5 | `playstation_5` |
 
+Storefront-only models (not tied to a catalog product):
+
+| Use | Model folder |
+| --- | --- |
+| Home hero basket | `cover_basket` (`loqta-cart-1.gltf`) |
+| "Up to 70% off" — Galaxy S21 Ultra | `samsung_galaxy_s21_ultra` |
+| "Up to 70% off" — PlayStation 5 | `playstation_ps5` |
+| "Up to 70% off" — Rotom Game Boy | `rotom_game_boy` |
+| "Up to 70% off" — DJI FPV drone | `camers1` |
+
 All ten reference products that ship with a 3D model are shown in the catalog;
 anything without a model is not listed (see `src/data/demoProducts.ts`).
 
