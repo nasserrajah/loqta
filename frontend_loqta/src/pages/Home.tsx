@@ -130,6 +130,10 @@ export function Home() {
                 modelUrl={HERO_MODEL_URL}
                 productName={t('heroTitle')}
                 className="w-full h-full overflow-hidden relative"
+                showReset={false}
+                interactive={false}
+                alwaysRotate
+                zoom={0.72}
               />
             </div>
           </div>

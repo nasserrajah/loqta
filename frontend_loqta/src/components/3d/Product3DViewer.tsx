@@ -26,6 +26,14 @@ interface ViewerProps {
   productName: string;
   /** Overrides the default card chrome (height / background / border). */
   className?: string;
+  /** Show the reset-view button (default true). */
+  showReset?: boolean;
+  /** Allow drag-to-rotate (default true). */
+  interactive?: boolean;
+  /** Keep spinning even after interaction (default false). */
+  alwaysRotate?: boolean;
+  /** 1 = default framing; lower values render the model smaller. */
+  zoom?: number;
 }
 
 /** Real product photo, or a neutral placeholder when no image exists. */
@@ -77,7 +85,16 @@ function useInViewOnce(
   return [inView, ref];
 }
 
-export function Product3DViewer({ modelUrl, fallbackImage, productName, className }: ViewerProps) {
+export function Product3DViewer({
+  modelUrl,
+  fallbackImage,
+  productName,
+  className,
+  showReset = true,
+  interactive = true,
+  alwaysRotate = false,
+  zoom = 1,
+}: ViewerProps) {
   const { t } = useAppStore();
   const [forceReset, setForceReset] = useState(0);
   const [hasFailed, setHasFailed] = useState(false);
@@ -117,17 +134,18 @@ export function Product3DViewer({ modelUrl, fallbackImage, productName, classNam
         </div>
       ) : (
         <>
-          <div className="absolute top-4 right-4 z-10">
-            <button
-              onClick={() => setForceReset((prev) => prev + 1)}
-              className="p-2 bg-white rounded-full shadow hover:bg-gray-100 transition"
-              title={t('resetView')}
-              aria-label={t('resetView')}
-            >
-              <RefreshCw className="w-5 h-5 text-gray-700" />
-            </button>
-          </div>
-
+          {showReset && (
+            <div className="absolute top-4 right-4 z-10">
+              <button
+                onClick={() => setForceReset((prev) => prev + 1)}
+                className="p-2 bg-white rounded-full shadow hover:bg-gray-100 transition"
+                title={t('resetView')}
+                aria-label={t('resetView')}
+              >
+                <RefreshCw className="w-5 h-5 text-gray-700" />
+              </button>
+            </div>
+          )}
           <ModelErrorBoundary
             fallback={
               <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-500">
@@ -148,6 +166,9 @@ export function Product3DViewer({ modelUrl, fallbackImage, productName, classNam
                   modelUrl={modelUrl!}
                   loadingLabel={t('loading3d')}
                   reducedMotion={reducedMotion}
+                  interactive={interactive}
+                  alwaysRotate={alwaysRotate}
+                  zoom={zoom}
                   onFail={() => setHasFailed(true)}
                 />
               </ViewportErrorBridge>

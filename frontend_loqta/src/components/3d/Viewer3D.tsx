@@ -10,12 +10,13 @@ const TARGET_SIZE = 4;
 interface SceneProps {
   modelUrl: string;
   rotate: boolean;
+  alwaysRotate: boolean;
   loadingLabel: string;
   interactive: boolean;
   onReady?: () => void;
 }
 
-function Scene({ modelUrl, rotate, loadingLabel, interactive, onReady }: SceneProps) {
+function Scene({ modelUrl, rotate, alwaysRotate, loadingLabel, interactive, onReady }: SceneProps) {
   const invalidate = useThree((state) => state.invalidate);
   // Idle rotation stops as soon as the shopper takes control.
   const interactedRef = useRef(false);
@@ -41,6 +42,7 @@ function Scene({ modelUrl, rotate, loadingLabel, interactive, onReady }: ScenePr
         <Model
           url={modelUrl}
           rotate={rotate}
+          alwaysRotate={alwaysRotate}
           invalidate={invalidate}
           interactedRef={interactedRef}
           onReady={onReady}
@@ -89,12 +91,14 @@ function StudioEnvironment() {
 function Model({
   url,
   rotate,
+  alwaysRotate,
   invalidate,
   interactedRef,
   onReady,
 }: {
   url: string;
   rotate: boolean;
+  alwaysRotate: boolean;
   invalidate: () => void;
   interactedRef: MutableRefObject<boolean>;
   onReady?: () => void;
@@ -143,7 +147,7 @@ function Model({
   }, [scene, invalidate]);
 
   useFrame((_state, delta) => {
-    if (rotate && !interactedRef.current && spinRef.current) {
+    if (rotate && (alwaysRotate || !interactedRef.current) && spinRef.current) {
       // Subtle idle rotation; skipped for prefers-reduced-motion users.
       spinRef.current.rotation.y += delta * 0.25;
       invalidate(); // request the next frame in frameloop="demand" mode
@@ -180,6 +184,10 @@ export interface Viewer3DProps {
   reducedMotion: boolean;
   /** Cards render a non-interactive auto-spinning miniature. */
   interactive?: boolean;
+  /** Keeps spinning even after the shopper interacts (used by the hero). */
+  alwaysRotate?: boolean;
+  /** 1 = default framing; 0.75 renders the model 25% smaller. */
+  zoom?: number;
   /** Fired once the model is loaded and framed — used to fade it in. */
   onReady?: () => void;
   onFail?: () => void;
@@ -197,6 +205,8 @@ export default function Viewer3D({
   loadingLabel,
   reducedMotion,
   interactive = true,
+  alwaysRotate = false,
+  zoom = 1,
   onReady,
   onFail,
 }: Viewer3DProps) {
@@ -204,7 +214,7 @@ export default function Viewer3D({
     <Canvas
       frameloop="demand"
       dpr={[1, 1.5]}
-      camera={{ position: [0, 0, 5.5], fov: 45 }}
+      camera={{ position: [0, 0, 5.5 / zoom], fov: 45 }}
       // Touch drag rotates the model; vertical swipes still scroll the page.
       style={{ touchAction: interactive ? 'pan-y' : 'auto' }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
@@ -212,6 +222,7 @@ export default function Viewer3D({
       <Scene
         modelUrl={modelUrl}
         rotate={!reducedMotion}
+        alwaysRotate={alwaysRotate}
         loadingLabel={loadingLabel}
         interactive={interactive}
         onReady={onReady}
