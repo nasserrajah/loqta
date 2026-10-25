@@ -5,7 +5,11 @@ function cookieOptions(secure: boolean): CookieOptions {
   return {
     httpOnly: true,
     secure,
-    sameSite: 'lax',
+    // The frontend lives on a different origin during local development (and
+    // potentially in production), so the cookie must travel in cross-site
+    // requests. SameSite=None requires the Secure flag, which matches the
+    // `secure` argument (true in production behind HTTPS).
+    sameSite: secure ? 'none' : 'lax',
     path: '/',
   };
 }

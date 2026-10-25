@@ -29,7 +29,11 @@ function sessionContext(req: Request): SessionContext {
 }
 
 function toAuthResponse(result: AuthSessionResult): AuthResponseDto {
-  return { user: result.user, session: { expiresAt: result.expiresAt } };
+  return {
+    user: result.user,
+    session: { expiresAt: result.expiresAt },
+    token: result.token,
+  };
 }
 
 export function createAuthController({

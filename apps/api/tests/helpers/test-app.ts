@@ -1,4 +1,5 @@
 import type { Express } from 'express';
+import pino from 'pino';
 import { createApp } from '../../src/app.js';
 import { loadEnv, type Env } from '../../src/config/env.js';
 import { createContainer, type Container } from '../../src/infrastructure/container.js';
@@ -35,7 +36,10 @@ export async function createTestContext(
   const db = createSqliteDatabase(':memory:');
   await runMigrations(db);
   const env = testEnv(options.env);
-  const container = createContainer({ db, env });
+  // pino-http requires a real pino logger (it reads logger.levels internally),
+  // so inject one with silent output for tests.
+  const logger = pino({ level: 'silent' });
+  const container = createContainer({ db, env, logger });
   if (options.seed) {
     await seedDemoData(db, container.passwordHasher);
   }

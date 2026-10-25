@@ -5,6 +5,12 @@ export interface AuthResponseDto {
   session: {
     expiresAt: string;
   };
+  /**
+   * Opaque session token. The same value is also set as an HttpOnly cookie;
+   * exposing it lets browser clients from other origins authenticate with an
+   * Authorization header when third-party cookies are unavailable.
+   */
+  token: string;
 }
 
 export interface AuthSessionResult {

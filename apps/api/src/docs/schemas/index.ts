@@ -69,13 +69,18 @@ export const schemas = {
   },
   AuthResponse: {
     type: 'object',
-    required: ['user', 'session'],
+    required: ['user', 'session', 'token'],
     properties: {
       user: ref('User'),
       session: {
         type: 'object',
         required: ['expiresAt'],
         properties: { expiresAt: { type: 'string', format: 'date-time' } },
+      },
+      token: {
+        type: 'string',
+        description:
+          'Opaque session token. Also set as an HttpOnly cookie; send it as an Authorization: Bearer header when cookies are unavailable.',
       },
     },
   },

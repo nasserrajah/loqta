@@ -182,7 +182,23 @@ export class AuthService {
     await this.emailSender.send({
       to: user.email,
       subject: 'Reset your Loqta password',
-      text: `Use this link to reset your password: ${resetUrl}\nThe link expires in ${this.options.passwordResetTtlMinutes} minutes.`,
+      text: [
+        'You asked to reset your Loqta password.',
+        '',
+        'Your password reset code is:',
+        '',
+        `    ${token}`,
+        '',
+        `1. Open the reset page: ${this.options.appUrl}/reset-password`,
+        '2. Paste the code above into the "Reset code" field.',
+        '3. Choose a new password and save.',
+        '',
+        'Direct link (also works):',
+        resetUrl,
+        '',
+        `The code expires in ${this.options.passwordResetTtlMinutes} minutes.`,
+        "If you didn't request this, you can safely ignore this email.",
+      ].join('\n'),
     });
 
     // Always return token for now so it can be used from the frontend in this setup

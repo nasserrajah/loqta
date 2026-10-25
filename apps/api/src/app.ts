@@ -40,7 +40,16 @@ export function createApp(container: Container): Express {
     );
     next();
   });
-  app.use(cors({ origin: container.env.CORS_ORIGINS, credentials: true }));
+  const isWildcard = container.env.CORS_ORIGINS.includes('*');
+  app.use(
+    cors({
+      // A wildcard origin cannot be combined with credentialed requests, so we
+      // echo the request origin instead; this keeps the session cookie usable
+      // from any allowed frontend host.
+      origin: isWildcard ? true : container.env.CORS_ORIGINS,
+      credentials: true,
+    }),
+  );
   app.use(
     pinoHttp({
       logger: container.logger,

@@ -1,6 +1,6 @@
 import type { Logger } from 'pino';
 import type { Env } from '../config/env.js';
-import { ConsoleEmailSender, type EmailSender } from './email/index.js';
+import { ConsoleEmailSender, ResendEmailSender, type EmailSender } from './email/index.js';
 import { BcryptPasswordHasher, type PasswordHasher } from './security/index.js';
 import {
   SqliteBrandRepository,
@@ -109,7 +109,11 @@ export function createContainer({
   };
 
   const passwordHasher = new BcryptPasswordHasher(env.BCRYPT_ROUNDS);
-  const emailSender = new ConsoleEmailSender(logger);
+  // Resend is used when an API key is configured; otherwise emails are logged
+  // to the console (local development only — they are never delivered).
+  const emailSender: EmailSender = env.RESEND_API_KEY
+    ? new ResendEmailSender(env.RESEND_API_KEY, logger, env.EMAIL_FROM)
+    : new ConsoleEmailSender(logger);
 
   const auth = new AuthService(
     repositories.users,

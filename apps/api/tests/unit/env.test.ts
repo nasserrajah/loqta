@@ -21,8 +21,8 @@ describe('loadEnv', () => {
     expect(() => loadEnv({ PORT: '99999' })).toThrow(/Invalid environment/);
   });
 
-  it('rejects wildcard CORS in production', () => {
-    expect(() => loadEnv({ NODE_ENV: 'production', CORS_ORIGINS: '*' })).toThrow(/Wildcard CORS/);
+  it('currently allows wildcard CORS in production (temporary during initial deployment; re-enable the superRefine check in env.schema.ts when the frontend domain is finalized)', () => {
+    expect(loadEnv({ NODE_ENV: 'production', CORS_ORIGINS: '*' }).CORS_ORIGINS).toEqual(['*']);
   });
 
   it('parses boolean flags', () => {
