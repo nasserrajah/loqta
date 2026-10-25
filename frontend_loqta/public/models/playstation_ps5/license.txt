@@ -1,0 +1,11 @@
+Model Information:
+* title:	PlayStation_PS5_ Box_7_MB
+* source:	https://sketchfab.com/3d-models/playstation-ps5--box-7-mb-a3fe43d409ed4551ac6b9e150fa35386
+* author:	Mehdi Shahsavan (https://sketchfab.com/ahmagh2e)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "PlayStation_PS5_ Box_7_MB" (https://sketchfab.com/3d-models/playstation-ps5--box-7-mb-a3fe43d409ed4551ac6b9e150fa35386) by Mehdi Shahsavan (https://sketchfab.com/ahmagh2e) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

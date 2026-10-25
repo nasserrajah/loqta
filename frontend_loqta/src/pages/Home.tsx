@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Star, MessageSquare, CreditCard, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductCard } from '../components/products/ProductCard';
+import { Product3DViewer } from '../components/3d/Product3DViewer';
+import { Product3DThumb } from '../components/3d/Product3DThumb';
 import { DEMO_PRODUCTS, type Product } from '../data/demoProducts';
 import { useAppStore } from '../store/useAppStore';
 import { productService } from '../services/api';
 import { mapBackendProduct } from '../lib/mappers';
+
+/** The animated shopping basket shown in the hero. */
+const HERO_MODEL_URL = '/models/cover_basket/loqta-cart-1.gltf';
 
 const CATEGORY_LINKS = [
   {
@@ -40,26 +45,30 @@ const CATEGORY_LINKS = [
   },
 ];
 
-const PROMO_ITEMS = [
+/**
+ * "Get up to 70% off" rail. Every tile is a real 3D model (public/models),
+ * not a stock photo, so shoppers can inspect the offer in 3D right away.
+ */
+const DEAL_ITEMS = [
   {
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&q=80',
-    en: 'In All Laptops', ar: 'في كل اللابتوبات',
-    save: '$102',
+    modelUrl: '/models/samsung_galaxy_s21_ultra/scene.gltf',
+    en: 'Galaxy S21 Ultra', ar: 'جالاكسي S21 ألترا',
+    discount: 70,
   },
   {
-    image: 'https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?w=400&q=80',
-    en: 'In All Smartphones', ar: 'في كل الهواتف',
-    save: '$105',
+    modelUrl: '/models/playstation_ps5/scene.gltf',
+    en: 'PlayStation 5', ar: 'بلايستيشن 5',
+    discount: 55,
   },
   {
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80',
-    en: 'In All Headphones', ar: 'في كل السماعات',
-    save: '$104',
+    modelUrl: '/models/rotom_game_boy/scene.gltf',
+    en: 'Rotom Game Boy', ar: 'روتوم جيم بوي',
+    discount: 45,
   },
   {
-    image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=400&q=80',
-    en: 'In All Gaming', ar: 'في كل الألعاب',
-    save: '$103',
+    modelUrl: '/models/camers1/scene.gltf',
+    en: 'DJI FPV Drone', ar: 'درون DJI FPV',
+    discount: 60,
   },
 ];
 
@@ -117,10 +126,10 @@ export function Home() {
               </Link>
             </div>
             <div className="relative h-64 md:h-96">
-              <img
-                src="https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=800&q=80"
-                alt="Hero"
-                className="absolute inset-0 w-full h-full object-contain drop-shadow-2xl"
+              <Product3DViewer
+                modelUrl={HERO_MODEL_URL}
+                productName={t('heroTitle')}
+                className="w-full h-full overflow-hidden relative"
               />
             </div>
           </div>
@@ -168,33 +177,33 @@ export function Home() {
         </div>
       </section>
 
-      {/* GET UP TO 70% OFF */}
+      {/* GET UP TO 70% OFF — real 3D deals */}
       <section className="container mx-auto px-4 mt-12">
         <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-5">{t('getUpTo70')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {PROMO_ITEMS.map((item, i) => (
-            <div key={i} className="relative bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition">
-              <div className="aspect-square bg-gray-50 overflow-hidden">
-                <img
-                  src={item.image}
-                  alt={item.en}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
-              </div>
-              <div className="p-3 flex items-center justify-between gap-2">
-                <div>
-                  <p className="text-[11px] text-gray-500">{language === 'ar' ? item.ar : item.en}</p>
-                  <p className="text-xs font-bold text-gray-900 mt-0.5">
-                    {t('save')} <span className="text-primary-700">{item.save}</span>
-                  </p>
+          {DEAL_ITEMS.map((item) => {
+            const name = language === 'ar' ? item.ar : item.en;
+            return (
+              <Link
+                key={item.modelUrl}
+                to="/products"
+                className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition"
+              >
+                <div className="relative aspect-square bg-gray-50 overflow-hidden">
+                  <Product3DThumb modelUrl={item.modelUrl} alt={name} />
+                  <span className="absolute top-3 start-3 bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md">
+                    -{item.discount}%
+                  </span>
                 </div>
-                <button className="p-1.5 bg-primary-50 text-primary-600 rounded-md hover:bg-primary-600 hover:text-white transition">
-                  <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
-                </button>
-              </div>
-            </div>
-          ))}
+                <div className="p-3 flex items-center justify-between gap-2">
+                  <p className="text-xs font-bold text-gray-900">{name}</p>
+                  <span className="shrink-0 p-1.5 bg-primary-50 text-primary-600 rounded-md group-hover:bg-primary-600 group-hover:text-white transition">
+                    <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 

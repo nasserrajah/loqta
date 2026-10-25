@@ -24,6 +24,8 @@ interface ViewerProps {
   modelUrl?: string;
   fallbackImage?: string;
   productName: string;
+  /** Overrides the default card chrome (height / background / border). */
+  className?: string;
 }
 
 /** Real product photo, or a neutral placeholder when no image exists. */
@@ -75,7 +77,7 @@ function useInViewOnce(
   return [inView, ref];
 }
 
-export function Product3DViewer({ modelUrl, fallbackImage, productName }: ViewerProps) {
+export function Product3DViewer({ modelUrl, fallbackImage, productName, className }: ViewerProps) {
   const { t } = useAppStore();
   const [forceReset, setForceReset] = useState(0);
   const [hasFailed, setHasFailed] = useState(false);
@@ -86,7 +88,14 @@ export function Product3DViewer({ modelUrl, fallbackImage, productName }: Viewer
 
   return (
     // a11y: the container exposes the product name to assistive tech
-    <div ref={containerRef} aria-label={productName} className="w-full h-[400px] bg-gray-50 rounded-xl overflow-hidden relative border border-gray-200">
+    <div
+      ref={containerRef}
+      aria-label={productName}
+      className={
+        className ??
+        'w-full h-[400px] bg-gray-50 rounded-xl overflow-hidden relative border border-gray-200'
+      }
+    >
       {!showViewer ? (
         <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center overflow-hidden relative">
           <FallbackMedia image={fallbackImage} productName={productName} className="w-full h-full object-cover opacity-80" />
