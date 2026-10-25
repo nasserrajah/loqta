@@ -20,7 +20,10 @@ export function ProductDetails() {
     async function fetchProduct() {
       if (!id) return;
 
-      const demo = DEMO_PRODUCTS.find((item) => item.id === id);
+      // Demo products (incl. the local 3D deals) resolve by id or slug.
+      const demo = DEMO_PRODUCTS.find(
+        (item) => item.id === id || (item.slug && item.slug === id),
+      );
       if (demo) {
         setProduct(demo);
         setLoading(false);

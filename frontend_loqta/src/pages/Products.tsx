@@ -5,8 +5,10 @@ import { ProductCard } from '../components/products/ProductCard';
 import { useAppStore } from '../store/useAppStore';
 import { productService, categoryService } from '../services/api';
 import { mapBackendProduct } from '../lib/mappers';
+import { mergeCatalog } from '../lib/catalog';
+import { translateCategory } from '../lib/catalogAr';
 import { DEMO_PRODUCTS, type Product } from '../data/demoProducts';
-import type { CategoryDto, ProductListQuery, PaginationMeta, CategoriesResponse } from '../services/types';
+import type { CategoryDto, ProductListQuery, CategoriesResponse } from '../services/types';
 
 const PAGE_SIZE = 12;
 const SEARCH_DEBOUNCE_MS = 350;
@@ -21,14 +23,23 @@ const FALLBACK_CATEGORIES: CategoryDto[] = [
   { id: 'gaming', name: 'Gaming Devices', slug: 'gaming' },
 ];
 
-function filterAndSortDemo(products: Product[], search: string, category: string, sort: string): Product[] {
+function filterAndSort(
+  products: Product[],
+  search: string,
+  categoryName: string,
+  sort: string,
+): Product[] {
   let result = products;
   if (search) {
     const q = search.toLowerCase();
-    result = result.filter((p) => p.name.toLowerCase().includes(q));
+    result = result.filter(
+      (p) => p.name.toLowerCase().includes(q) || (p.nameAr ?? '').includes(search),
+    );
   }
-  if (category) {
-    result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+  if (categoryName) {
+    result = result.filter(
+      (p) => p.category.toLowerCase() === categoryName.toLowerCase(),
+    );
   }
   switch (sort) {
     case 'price_asc':
@@ -52,7 +63,6 @@ export function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -95,70 +105,69 @@ export function Products() {
     };
   }, []);
 
-  // Fetch products whenever filters change.
+  // Load the catalog once. The "3D only" filter, the local deal items, search,
+  // category and sorting are all applied client-side; the API call requests the
+  // full catalog at once (pageSize 100).
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
 
-    const params: ProductListQuery = {
-      page: 1,
-      // The storefront only lists products that have a 3D model, and that
-      // filtering happens client-side, so request the full catalog at once.
-      pageSize: 100,
-      sort: sort ?? 'newest',
-    };
-    if (search) params.search = search;
-    if (category) params.category = category;
-
     productService
-      .getProducts(params)
+      .getProducts({ page: 1, pageSize: 100, sort: 'newest' })
       .then((response) => {
         if (cancelled) return;
-        // Only products with a working 3D model are part of the storefront.
-        const items = (response.data ?? []).map(mapBackendProduct).filter((item) => Boolean(item.modelUrl));
-        if (items.length === 0 && page === 1) {
-          // Backend reachable but no matching data — fall back to the demo
+        const apiItems = (response.data ?? [])
+          .map(mapBackendProduct)
+          .filter((item) => Boolean(item.modelUrl));
+        if (apiItems.length === 0) {
+          // Backend reachable but nothing has a 3D model — show the demo
           // catalog so the storefront never looks broken.
-          setProducts(filterAndSortDemo(DEMO_PRODUCTS, search, category, sort ?? 'newest'));
-          setMeta(null);
+          setProducts(DEMO_PRODUCTS);
           setIsDemoMode(true);
         } else {
-          const start = (page - 1) * PAGE_SIZE;
-          const pageItems = items.slice(start, start + PAGE_SIZE);
-          const previous = page > 1;
-          setProducts((prev) => (previous ? [...prev, ...pageItems] : pageItems));
-          setMeta({
-            page,
-            pageSize: PAGE_SIZE,
-            total: items.length,
-            totalPages: Math.ceil(items.length / PAGE_SIZE),
-            hasNextPage: start + pageItems.length < items.length,
-            hasPreviousPage: page > 1,
-          });
+          setProducts(mergeCatalog(apiItems));
           setIsDemoMode(false);
         }
-        setLoading(false);
       })
       .catch(() => {
         if (cancelled) return;
-        // API unavailable — show the demo catalog with client-side filtering.
-        setProducts(filterAndSortDemo(DEMO_PRODUCTS, search, category, sort ?? 'newest'));
-        setMeta(null);
+        setProducts(DEMO_PRODUCTS);
         setIsDemoMode(true);
-        setLoading(false);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [search, category, sort, page]);
+  }, []);
+
+  const activeCategoryName = useMemo(
+    () => categories.find((c) => c.slug === category)?.name ?? '',
+    [categories, category],
+  );
+
+  const filtered = useMemo(
+    () => filterAndSort(products, search, activeCategoryName, sort ?? 'newest'),
+    [products, search, activeCategoryName, sort],
+  );
+
+  const visibleProducts = filtered.slice(0, page * PAGE_SIZE);
+  const hasNextPage = visibleProducts.length < filtered.length;
 
   const activeFilterLabel = useMemo(() => {
     const parts: string[] = [];
-    if (category) parts.push(`${t('filterByCategory')}: ${category}`);
+    if (category) {
+      const label =
+        language === 'ar'
+          ? translateCategory(activeCategoryName) ?? activeCategoryName
+          : activeCategoryName;
+      parts.push(`${t('filterByCategory')}: ${label || category}`);
+    }
     if (search) parts.push(`"${search}"`);
     return parts.join(' · ');
-  }, [category, search, t]);
+  }, [category, search, t, language, activeCategoryName]);
 
   const hasDemoData = products.some((p) => p.isDemo);
 
@@ -262,7 +271,7 @@ export function Products() {
               category === c.slug ? 'bg-primary-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
             }`}
           >
-            {c.name}
+            {language === 'ar' ? translateCategory(c.slug) ?? c.name : c.name}
           </button>
         ))}
       </div>
@@ -270,7 +279,7 @@ export function Products() {
       {activeFilterLabel && !loading && (
         <div className="flex items-center justify-between mb-6 text-sm text-gray-500">
           <span>
-            {products.length} {t('results')} · {activeFilterLabel}
+            {filtered.length} {t('results')} · {activeFilterLabel}
           </span>
           <button onClick={clearFilters} className="text-primary-600 font-semibold hover:underline">
             {t('clearFilters')}
@@ -281,7 +290,7 @@ export function Products() {
       {/* Content */}
       {loading ? (
         loadingSkeleton
-      ) : products.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="py-24 text-center flex flex-col items-center">
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
             <SearchX className="w-10 h-10 text-gray-400" />
@@ -295,13 +304,13 @@ export function Products() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product) => (
+            {visibleProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
           <div className="flex justify-center mt-10">
-            {meta?.hasNextPage && (
+            {hasNextPage && (
               <button
                 onClick={() => setPage((p) => p + 1)}
                 disabled={loading}

@@ -8,6 +8,8 @@ import { DEMO_PRODUCTS, type Product } from '../data/demoProducts';
 import { useAppStore } from '../store/useAppStore';
 import { productService } from '../services/api';
 import { mapBackendProduct } from '../lib/mappers';
+import { dealProducts, discountPercent, mergeCatalog } from '../lib/catalog';
+import { pickLocalized } from '../lib/i18n';
 
 /** The animated shopping basket shown in the hero. */
 const HERO_MODEL_URL = '/models/cover_basket/loqta-cart-1.gltf';
@@ -45,33 +47,6 @@ const CATEGORY_LINKS = [
   },
 ];
 
-/**
- * "Get up to 70% off" rail. Every tile is a real 3D model (public/models),
- * not a stock photo, so shoppers can inspect the offer in 3D right away.
- */
-const DEAL_ITEMS = [
-  {
-    modelUrl: '/models/samsung_galaxy_s21_ultra/scene.gltf',
-    en: 'Galaxy S21 Ultra', ar: 'جالاكسي S21 ألترا',
-    discount: 70,
-  },
-  {
-    modelUrl: '/models/playstation_ps5/scene.gltf',
-    en: 'PlayStation 5', ar: 'بلايستيشن 5',
-    discount: 55,
-  },
-  {
-    modelUrl: '/models/rotom_game_boy/scene.gltf',
-    en: 'Rotom Game Boy', ar: 'روتوم جيم بوي',
-    discount: 45,
-  },
-  {
-    modelUrl: '/models/camers1/scene.gltf',
-    en: 'DJI FPV Drone', ar: 'درون DJI FPV',
-    discount: 60,
-  },
-];
-
 export function Home() {
   const { t, language } = useAppStore();
   const [products, setProducts] = useState<Product[]>([]);
@@ -85,11 +60,7 @@ export function Home() {
         const response = await productService.getProducts({ pageSize: 100 });
         const items = (response.data ?? []).map(mapBackendProduct).filter((item) => Boolean(item.modelUrl));
         if (cancelled) return;
-        if (items.length > 0 && !items.every((p) => p.isDemo)) {
-          setProducts(items);
-        } else {
-          setProducts(DEMO_PRODUCTS);
-        }
+        setProducts(items.length > 0 ? mergeCatalog(items) : DEMO_PRODUCTS);
       } catch {
         if (!cancelled) setProducts(DEMO_PRODUCTS);
       } finally {
@@ -185,19 +156,22 @@ export function Home() {
       <section className="container mx-auto px-4 mt-12">
         <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-5">{t('getUpTo70')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {DEAL_ITEMS.map((item) => {
-            const name = language === 'ar' ? item.ar : item.en;
+          {dealProducts().map((item) => {
+            const name = pickLocalized(language, item.name, item.nameAr);
+            const discount = discountPercent(item);
             return (
               <Link
-                key={item.modelUrl}
-                to="/products"
+                key={item.id}
+                to={`/products/${item.slug ?? item.id}`}
                 className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition"
               >
                 <div className="relative aspect-square bg-gray-50 overflow-hidden">
-                  <Product3DThumb modelUrl={item.modelUrl} alt={name} />
-                  <span className="absolute top-3 start-3 bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md">
-                    -{item.discount}%
-                  </span>
+                  <Product3DThumb modelUrl={item.modelUrl} image={item.image} alt={name} />
+                  {discount > 0 && (
+                    <span className="absolute top-3 start-3 bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md">
+                      -{discount}%
+                    </span>
+                  )}
                 </div>
                 <div className="p-3 flex items-center justify-between gap-2">
                   <p className="text-xs font-bold text-gray-900">{name}</p>

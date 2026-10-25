@@ -7,7 +7,9 @@ import { useAppStore } from '../store/useAppStore';
  * real 3D model, no auto-generated extras, and correct demo fields.
  */
 test('demo catalog contains only the products with 3D models', () => {
-  expect(DEMO_PRODUCTS).toHaveLength(8);
+  // 8 reference products + 4 demo deal items (Galaxy S21 Ultra, PS5 bundle,
+  // Rotom Game Boy, DJI FPV drone) that power the "up to 70% off" row.
+  expect(DEMO_PRODUCTS).toHaveLength(11);
 
   const names = DEMO_PRODUCTS.map((p) => p.name);
   expect(names).toEqual(
@@ -20,6 +22,9 @@ test('demo catalog contains only the products with 3D models', () => {
       'LG UltraWide Monitor',
       'Sony Alpha Camera',
       'PlayStation 5',
+      'Galaxy S21 Ultra',
+      'Rotom Game Boy',
+      'DJI FPV Drone',
     ]),
   );
 

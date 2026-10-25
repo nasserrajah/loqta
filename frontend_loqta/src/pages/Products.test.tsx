@@ -94,7 +94,7 @@ test('renders the empty state after a search with no matches', async () => {
   });
 });
 
-test('maps real API products without demo badges', async () => {
+test('lists real API products first, then the 4 demo deal items', async () => {
   mockedGetProducts.mockResolvedValue({
     data: [
       {
@@ -124,5 +124,14 @@ test('maps real API products without demo badges', async () => {
 
   renderProducts();
   await waitFor(() => expect(screen.getByText('iPhone 15 Pro')).toBeTruthy());
-  expect(screen.queryAllByText(/Demo Data|بيانات تجريبية/i).length).toBe(0);
+
+  // The live API items carry no demo badge…
+  const apiCards = screen.getAllByText('iPhone 15 Pro').length;
+  expect(apiCards).toBeGreaterThan(0);
+
+  // …while the appended 3D deal items honestly show one, plus their discount.
+  expect(screen.getAllByText(/Demo Data|بيانات تجريبية/i)).toHaveLength(4);
+  expect(screen.getByText('Galaxy S21 Ultra')).toBeTruthy();
+  expect(screen.getByText('Rotom Game Boy')).toBeTruthy();
+  expect(screen.getByText('DJI FPV Drone')).toBeTruthy();
 });

@@ -1,6 +1,7 @@
 import { Product } from '../data/demoProducts';
 import { resolveModelUrl } from '../data/modelRegistry';
 import { isDisplayableImage } from './images';
+import { translateCategory, translateProductName } from './catalogAr';
 
 /** Picks the primary image the API really provides (never a generated one). */
 function pickImage(item: any): string {
@@ -46,13 +47,17 @@ export function mapBackendProduct(item: any): Product {
     id: item.id,
     slug: item.slug,
     name: item.name,
-    nameAr: item.nameAr ?? item.name_ar ?? undefined,
+    // The API leaves nameAr null: fall back to the storefront translation.
+    nameAr: item.nameAr ?? item.name_ar ?? translateProductName(item.name),
     description: item.description || 'No description available.',
     descriptionAr: item.descriptionAr ?? item.description_ar ?? undefined,
     image: pickImage(item),
     modelUrl,
     category: item.category?.name || 'General',
-    categoryAr: item.category?.nameAr ?? item.category?.name_ar ?? undefined,
+    categoryAr:
+      item.category?.nameAr ??
+      item.category?.name_ar ??
+      translateCategory(item.category?.slug ?? item.category?.name),
     price: parseFloat(item.price) || 0,
     currency: item.currency || 'USD',
     originalPrice: item.originalPrice ? parseFloat(item.originalPrice) : undefined,
