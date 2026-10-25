@@ -71,28 +71,6 @@ api.interceptors.response.use(
   }
 );
 
-/** Normalizes backend errors into user-safe messages (no raw internals). */
-export function getApiErrorMessage(error: unknown, fallback: string): string {
-  const res: any = (error as any)?.response?.data;
-  const status = (error as any)?.response?.status;
-
-  if (status === 429) return 'Too many attempts. Please wait a moment and try again.';
-
-  if (res?.error?.message && typeof res.error.message === 'string') {
-    return res.error.message;
-  }
-  if (typeof res?.message === 'string' && res.message.length > 0) {
-    return res.message;
-  }
-  if (Array.isArray(res?.errors) && res.errors.length > 0) {
-    const msgs = res.errors.map((e: any) => e?.message).filter(Boolean);
-    if (msgs.length) return msgs.join(' | ');
-  }
-
-  console.error('API Error full:', res || error);
-  return fallback;
-}
-
 export const authService = {
   login: async (data: { email: string; password: string }): Promise<ApiEnvelope<AuthResponse>> => {
     const res = await api.post('/auth/login', data);

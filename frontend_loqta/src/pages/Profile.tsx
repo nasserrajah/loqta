@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { api, getApiErrorMessage, authService } from '../services/api';
+import { api, authService } from '../services/api';
+import { apiErrorMessage } from '../lib/apiErrors';
 import { useAppStore } from '../store/useAppStore';
 import { CheckCircle2, ShieldCheck, Lock } from 'lucide-react';
 
@@ -13,7 +14,7 @@ const profileSchema = z.object({
     .string()
     .trim()
     .max(20, { message: 'fieldRequired' })
-    .refine((v) => v === '' || /^[+\d\s()-]{5,20}$/.test(v), { message: 'invalidEmail' }),
+    .refine((v) => v === '' || /^[+\d\s()-]{5,20}$/.test(v), { message: 'invalidPhone' }),
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
@@ -124,7 +125,7 @@ export function Profile() {
       setStatus('saved');
       setTimeout(() => setStatus('idle'), 3000);
     } catch (error) {
-      setServerError(getApiErrorMessage(error, t('profileUpdateError')));
+      setServerError(apiErrorMessage(error, t, 'profile'));
       setStatus('error');
     }
   };
@@ -141,7 +142,7 @@ export function Profile() {
       resetPw();
       setTimeout(() => setPwStatus('idle'), 3000);
     } catch (error) {
-      setPwError(getApiErrorMessage(error, t('changePasswordError')));
+      setPwError(apiErrorMessage(error, t, 'password'));
       setPwStatus('error');
     }
   };

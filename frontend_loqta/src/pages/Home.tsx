@@ -47,11 +47,46 @@ const CATEGORY_LINKS = [
   },
 ];
 
+/** Demo customer stories for the testimonial carousel (clearly marked as samples in the UI). */
+const TESTIMONIALS = [
+  {
+    name: { en: 'Sarah M.', ar: 'سارة م.' },
+    roleKey: 'verifiedBuyer' as const,
+    quote: {
+      en: 'I ordered the headphones after checking them in 3D first. They arrived exactly as shown, and delivery was faster than I expected.',
+      ar: 'طلبت السماعات بعد ما فحصتها بالمجسّم ثلاثي الأبعاد. وصلت مطابقة تمامًا لما رأيت، والتوصيل أسرع من المتوقع.',
+    },
+    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80',
+    initials: 'SM',
+  },
+  {
+    name: { en: 'Omar K.', ar: 'عمر ك.' },
+    roleKey: 'verifiedBuyer' as const,
+    quote: {
+      en: 'Spinning the console in 3D before paying saved me from guessing. The product arrived matching every detail I saw on the page.',
+      ar: 'تدوير الجهاز ثلاثي الأبعاد قبل الدفع وفّر عليّ أي تخمين. وصل المنتج مطابقًا لكل التفاصيل التي رأيتها في الصفحة.',
+    },
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80',
+    initials: 'OK',
+  },
+  {
+    name: { en: 'Layla A.', ar: 'ليلى ع.' },
+    roleKey: 'verifiedBuyer' as const,
+    quote: {
+      en: 'Clear prices, quick support, and the 3D preview is genuinely useful. Loqta became my first stop for electronics.',
+      ar: 'أسعار واضحة ودعم سريع، ومعاينة المجسّم مفيدة فعلًا. صارت لُقطة وجهتي الأولى للأجهزة الإلكترونية.',
+    },
+    image: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=600&q=80',
+    initials: 'LA',
+  },
+];
+
 export function Home() {
   const { t, language } = useAppStore();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'bestselling' | 'new' | 'brands'>('bestselling');
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -251,39 +286,84 @@ export function Home() {
         </div>
       </section>
 
-      {/* TESTIMONIAL */}
+      {/* TESTIMONIALS — working bilingual carousel */}
       <section className="container mx-auto px-4 mt-16">
         <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-6">{t('whatClientsSay')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center bg-white rounded-3xl border border-gray-100 p-6 md:p-8">
-          <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100">
-            <img
-              src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&q=80"
-              alt="Customer"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-          <div>
-            <div className="w-10 h-10 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center mb-4">
-              <MessageSquare className="w-5 h-5" />
+        {(() => {
+          const item = TESTIMONIALS[testimonialIndex];
+          const goTo = (delta: number) =>
+            setTestimonialIndex((i) => (i + delta + TESTIMONIALS.length) % TESTIMONIALS.length);
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center bg-white rounded-3xl border border-gray-100 p-6 md:p-8">
+              <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100">
+                <img
+                  src={item.image}
+                  alt={pickLocalized(language, item.name.en, item.name.ar)}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div>
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                    <MessageSquare className="w-5 h-5" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => goTo(-1)}
+                      aria-label={t('previous')}
+                      className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goTo(1)}
+                      aria-label={t('next')}
+                      className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4 rtl:rotate-180" />
+                    </button>
+                  </div>
+                </div>
+                <p className="text-gray-700 leading-relaxed mb-4 text-sm md:text-base">
+                  {pickLocalized(language, item.quote.en, item.quote.ar)}
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-sm font-bold shrink-0">
+                    {item.initials}
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900 text-sm">
+                      {pickLocalized(language, item.name.en, item.name.ar)}
+                    </p>
+                    <p className="text-xs text-gray-500">{t(item.roleKey)}</p>
+                  </div>
+                </div>
+                <div className="flex gap-0.5 mt-3">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <div className="flex items-center gap-1.5 mt-4">
+                  {TESTIMONIALS.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setTestimonialIndex(i)}
+                      aria-label={`${i + 1}`}
+                      className={`h-2 rounded-full transition-all ${
+                        i === testimonialIndex ? 'w-6 bg-primary-600' : 'w-2 bg-gray-300 hover:bg-gray-400'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className="text-[11px] text-gray-400 mt-4">{t('testimonialsDemo')}</p>
+              </div>
             </div>
-            <p className="text-gray-700 leading-relaxed mb-4 text-sm md:text-base">
-              {language === 'ar'
-                ? 'كنت أطلب من لُقطة لشهور، ولم يخذلوني أبداً. المنتجات دائماً رائعة والتوصيل سريع جداً!'
-                : "I've been ordering from Loqta for months now, and they never disappoint. The products are always great, and delivery is super quick!"}
-            </p>
-            <p className="font-bold text-gray-900 text-sm">Michael Johnson / Customer</p>
-            <div className="flex gap-0.5 mt-2">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-              ))}
-            </div>
-            <div className="flex items-center gap-2 mt-4">
-              <button className="p-1.5 rounded-full border border-gray-200 hover:bg-gray-50"><ChevronLeft className="w-4 h-4 rtl:rotate-180" /></button>
-              <button className="p-1.5 rounded-full border border-gray-200 hover:bg-gray-50"><ChevronRight className="w-4 h-4 rtl:rotate-180" /></button>
-            </div>
-          </div>
-        </div>
+          );
+        })()}
       </section>
 
       {/* SERVICES */}

@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppStore } from '../store/useAppStore';
-import { authService, getApiErrorMessage } from '../services/api';
+import { authService } from '../services/api';
+import { apiErrorMessage } from '../lib/apiErrors';
 import { Lock, Mail, User as UserIcon } from 'lucide-react';
 
 const registerSchema = z
@@ -52,15 +53,8 @@ export function Register() {
       await setUser(user);
       navigate('/');
     } catch (error: any) {
-      console.error('REGISTER ERROR RAW:', error);
-      console.error('REGISTER ERROR RESPONSE:', error?.response?.data);
-      const res = error?.response?.data;
-      // Show raw response for debugging
-      if (res) {
-        setServerError(typeof res === 'string' ? res : JSON.stringify(res));
-        return;
-      }
-      setServerError(getApiErrorMessage(error, t('registerError')));
+      // Clear translated message — never the raw JSON response.
+      setServerError(apiErrorMessage(error, t, 'register'));
     }
   };
 

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { authService, getApiErrorMessage } from '../services/api';
+import { authService } from '../services/api';
+import { apiErrorMessage } from '../lib/apiErrors';
 import { useAppStore } from '../store/useAppStore';
 import { CheckCircle2, Mail } from 'lucide-react';
 
@@ -30,17 +31,11 @@ export function ForgotPassword() {
   const onSubmit = async (data: ForgotForm) => {
     setServerError('');
     try {
-      const res: any = await authService.forgotPassword(data.email);
-      // If backend returns resetToken in dev/testing, show it to the user
-      const token = res?.data?.resetToken || res?.resetToken;
-      if (token) {
-        setSent(true);
-        // Optionally navigate or just show message with token hint not needed
-      }
+      await authService.forgotPassword(data.email);
+      // Always confirm politely: the email only goes out for real accounts.
       setSent(true);
     } catch (error: any) {
-      console.error('FORGOT PASSWORD ERROR:', error?.response?.data || error);
-      setServerError(getApiErrorMessage(error, t('forgotPasswordError')));
+      setServerError(apiErrorMessage(error, t, 'forgot'));
     }
   };
 

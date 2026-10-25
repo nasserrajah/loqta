@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
-import { authService, getApiErrorMessage } from '../services/api';
+import { authService } from '../services/api';
+import { apiErrorMessage } from '../lib/apiErrors';
 import { Lock, Mail } from 'lucide-react';
 
 export function Login() {
   const navigate = useNavigate();
   const setUser = useAppStore(state => state.setUser);
   const { t } = useAppStore();
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -21,7 +22,6 @@ export function Login() {
 
     try {
       const response = await authService.login({ email, password });
-      console.log('Login response:', response);
       const user = response?.data?.user || (response as any)?.user || (response as any)?.data;
       if (!user?.id) {
         throw new Error('Invalid response from server');
@@ -29,17 +29,8 @@ export function Login() {
       await setUser(user);
       navigate('/');
     } catch (err: any) {
-      console.error('LOGIN ERROR RAW:', err);
-      console.error('LOGIN ERROR RESPONSE:', err?.response?.data);
-      const rawMsg =
-        err?.response?.data?.error?.message ||
-        err?.response?.data?.message ||
-        (Array.isArray(err?.response?.data?.errors) ? err?.response?.data?.errors[0]?.message : null);
-      if (rawMsg) {
-        setError(rawMsg);
-        return;
-      }
-      setError(getApiErrorMessage(err, t('loginError')));
+      // Always a clear, translated sentence — never the raw backend payload.
+      setError(apiErrorMessage(err, t, 'login'));
     } finally {
       setLoading(false);
     }
@@ -67,7 +58,7 @@ export function Login() {
                 type="email"
                 required
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 rtl:pr-10 rtl:pl-4"
-                placeholder="admin@loqta.dev"
+                placeholder={t('emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />

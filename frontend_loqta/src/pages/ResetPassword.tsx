@@ -3,7 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { authService, getApiErrorMessage } from '../services/api';
+import { authService } from '../services/api';
+import { apiErrorMessage } from '../lib/apiErrors';
 import { useAppStore } from '../store/useAppStore';
 import { CheckCircle2, KeyRound, Lock } from 'lucide-react';
 
@@ -50,7 +51,7 @@ export function ResetPassword() {
       setSuccess(true);
       setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
-      setServerError(getApiErrorMessage(error, t('resetPasswordError')));
+      setServerError(apiErrorMessage(error, t, 'reset'));
     }
   };
 
