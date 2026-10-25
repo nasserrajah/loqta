@@ -125,7 +125,7 @@ export function createContainer({
       sessionTtlDays: env.SESSION_TTL_DAYS,
       passwordResetTtlMinutes: env.PASSWORD_RESET_TTL_MINUTES,
       appUrl: env.APP_URL,
-      exposeResetToken: env.NODE_ENV !== 'production',
+      exposeResetToken: env.EXPOSE_RESET_TOKEN,
     },
   );
 

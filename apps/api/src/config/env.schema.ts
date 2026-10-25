@@ -28,6 +28,10 @@ export const envSchema = z
     BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(10),
     RATE_LIMIT_MAX: z.coerce.number().int().min(1).max(10_000).default(20),
     TRUST_PROXY: booleanFromEnv,
+    // Returns the reset code in the forgot-password response (local debugging
+    // only). Never enable this on a public deployment: the code must only
+    // travel by email.
+    EXPOSE_RESET_TOKEN: booleanFromEnv,
     // Resend — used to send transactional emails (password reset, etc.)
     RESEND_API_KEY: z.string().min(1).optional(),
     EMAIL_FROM: z.string().min(3).default('Loqta <onboarding@resend.dev>'),
