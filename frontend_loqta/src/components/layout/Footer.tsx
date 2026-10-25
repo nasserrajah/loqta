@@ -49,7 +49,11 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-100 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-gray-500">
-          <p className="font-bold text-gray-900 text-base">Loqta | لُقطة</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link to="/policies/privacy" className="hover:text-primary-600 transition">{t('privacyPolicy')}</Link>
+            <Link to="/policies/terms" className="hover:text-primary-600 transition">{t('termsOfService')}</Link>
+            <Link to="/policies/returns" className="hover:text-primary-600 transition">{t('returnPolicy')}</Link>
+          </div>
           <p>&copy; {year} Loqta. {t('footerRights')}</p>
         </div>
       </div>

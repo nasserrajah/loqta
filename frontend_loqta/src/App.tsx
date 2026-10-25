@@ -13,6 +13,7 @@ import { Register } from './pages/Register';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
 import { Profile } from './pages/Profile';
+import { Policies } from './pages/Policies';
 import { NotFound } from './pages/NotFound';
 import { useAppStore } from './store/useAppStore';
 
@@ -47,6 +48,8 @@ export default function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/policies" element={<Policies />} />
+            <Route path="/policies/:section" element={<Policies />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
