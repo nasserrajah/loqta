@@ -2,122 +2,258 @@ import { resolveModelUrl } from './modelRegistry';
 
 export interface Product {
   id: string;
-  /** Backend lookup key — the API only resolves products by slug. */
   slug?: string;
   name: string;
+  nameAr?: string;
   description: string;
+  descriptionAr?: string;
   image: string;
   modelUrl?: string;
   category: string;
+  categoryAr?: string;
   price?: number;
   currency?: string;
+  originalPrice?: number;
   inStock: boolean;
   isDemo: boolean;
+  rating?: number;
   specifications?: Record<string, string>;
+  specificationsAr?: Record<string, string>;
 }
 
-/**
- * Demo catalog — the reference products that have a real 3D model.
- *
- * 3D models come from src/data/modelRegistry.ts (GLTF bundles extracted under
- * public/models/). Only items with a working model are kept here so every
- * product page can offer the 3D viewer.
- */
 export const DEMO_PRODUCTS: Product[] = [
   {
     id: 'demo-2',
     name: 'ASUS ROG Gaming Laptop',
-    description: 'High-performance gaming laptop.',
+    nameAr: 'لابتوب ألعاب ASUS ROG',
+    description: 'High-performance gaming laptop with RGB keyboard and top-tier graphics.',
+    descriptionAr: 'لابتوب ألعاب عالي الأداء بلوحة مفاتيح RGB وبطاقة رسومات من الطراز الأول.',
     image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=500&q=80',
     modelUrl: resolveModelUrl('ASUS ROG Gaming Laptop'),
     category: 'Laptops',
+    categoryAr: 'لابتوبات',
     price: 1499.00,
+    originalPrice: 1799.00,
     currency: 'USD',
     inStock: true,
     isDemo: true,
+    rating: 4.8,
+    specifications: {
+      Processor: 'Intel Core i9-13980HX',
+      RAM: '32GB DDR5',
+      Storage: '1TB NVMe SSD',
+      GPU: 'NVIDIA RTX 4080',
+      Display: '16" QHD 240Hz',
+    },
+    specificationsAr: {
+      'المعالج': 'Intel Core i9-13980HX',
+      'الذاكرة': '32GB DDR5',
+      'التخزين': '1TB NVMe SSD',
+      'بطاقة الرسوميات': 'NVIDIA RTX 4080',
+      'الشاشة': '16" QHD 240Hz',
+    },
   },
   {
     id: 'demo-3',
     name: 'iPhone',
-    description: 'The latest smartphone from Apple.',
+    nameAr: 'آيفون',
+    description: 'The latest smartphone from Apple with an incredible camera system.',
+    descriptionAr: 'أحدث هاتف ذكي من آبل مع نظام كاميرا مذهل.',
     image: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&q=80',
     modelUrl: resolveModelUrl('iPhone'),
     category: 'Smartphones',
+    categoryAr: 'هواتف',
     price: 999.00,
+    originalPrice: 1099.00,
     currency: 'USD',
     inStock: true,
     isDemo: true,
+    rating: 4.9,
+    specifications: {
+      Display: '6.1" Super Retina XDR',
+      Chip: 'A17 Pro',
+      Camera: '48MP Triple',
+      Battery: 'Up to 29h video playback',
+    },
+    specificationsAr: {
+      'الشاشة': '6.1" Super Retina XDR',
+      'المعالج': 'A17 Pro',
+      'الكاميرا': '48 ميجابكسل ثلاثية',
+      'البطارية': 'حتى 29 ساعة تشغيل فيديو',
+    },
   },
   {
     id: 'demo-4',
     name: 'Samsung Galaxy',
-    description: 'Flagship Android smartphone.',
+    nameAr: 'سامسونج جالاكسي',
+    description: 'Flagship Android smartphone with S-Pen and dynamic AMOLED display.',
+    descriptionAr: 'هاتف أندرويد رائد مع قلم S-Pen وشاشة AMOLED ديناميكية.',
     image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&q=80',
     modelUrl: resolveModelUrl('Samsung Galaxy'),
     category: 'Smartphones',
+    categoryAr: 'هواتف',
     price: 899.00,
+    originalPrice: 999.00,
     currency: 'USD',
     inStock: true,
     isDemo: true,
+    rating: 4.7,
+    specifications: {
+      Display: '6.8" Dynamic AMOLED 2X',
+      Chip: 'Snapdragon 8 Gen 3',
+      Camera: '200MP Quad',
+      Battery: '5000 mAh',
+    },
+    specificationsAr: {
+      'الشاشة': '6.8" Dynamic AMOLED 2X',
+      'المعالج': 'Snapdragon 8 Gen 3',
+      'الكاميرا': '200 ميجابكسل رباعية',
+      'البطارية': '5000 مللي أمبير',
+    },
   },
   {
     id: 'demo-5',
     name: 'Sony WH-1000XM5',
-    description: 'Industry-leading noise-canceling headphones.',
+    nameAr: 'سوني WH-1000XM5',
+    description: 'Industry-leading noise-canceling headphones with 30-hour battery.',
+    descriptionAr: 'سماعات رائدة في إلغاء الضوضاء ببطارية تدوم 30 ساعة.',
     image: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500&q=80',
     modelUrl: resolveModelUrl('Sony WH-1000XM5'),
     category: 'Audio',
+    categoryAr: 'صوتيات',
     price: 399.00,
+    originalPrice: 449.00,
     currency: 'USD',
     inStock: true,
     isDemo: true,
+    rating: 4.9,
+    specifications: {
+      Type: 'Over-ear Wireless',
+      Battery: '30 hours',
+      'Noise Cancellation': 'Industry-leading ANC',
+      Weight: '250g',
+    },
+    specificationsAr: {
+      'النوع': 'لاسلكية فوق الأذن',
+      'البطارية': '30 ساعة',
+      'إلغاء الضوضاء': 'الأفضل في فئته',
+      'الوزن': '250 جرام',
+    },
   },
   {
     id: 'demo-7',
     name: 'Samsung Odyssey Monitor',
-    description: 'Immersive curved gaming monitor.',
+    nameAr: 'شاشة سامسونج أوديسي',
+    description: 'Immersive curved gaming monitor with 240Hz refresh rate.',
+    descriptionAr: 'شاشة ألعاب منحنية غامرة بمعدل تحديث 240 هرتز.',
     image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&q=80',
     modelUrl: resolveModelUrl('Samsung Odyssey Monitor'),
     category: 'Monitors',
+    categoryAr: 'شاشات',
     price: 699.00,
+    originalPrice: 899.00,
     currency: 'USD',
     inStock: true,
     isDemo: true,
+    rating: 4.6,
+    specifications: {
+      Size: '32"',
+      Resolution: '2560 x 1440 QHD',
+      'Refresh Rate': '240Hz',
+      Panel: 'VA Curved',
+    },
+    specificationsAr: {
+      'الحجم': '32 بوصة',
+      'الدقة': '2560 × 1440 QHD',
+      'معدل التحديث': '240 هرتز',
+      'اللوحة': 'VA منحنية',
+    },
   },
   {
     id: 'demo-8',
     name: 'LG UltraWide Monitor',
-    description: 'Multi-tasking ultrawide monitor.',
+    nameAr: 'شاشة إل جي عريضة',
+    description: 'Multi-tasking ultrawide monitor perfect for productivity.',
+    descriptionAr: 'شاشة عريضة مثالية لتعدد المهام والإنتاجية.',
     image: 'https://images.unsplash.com/photo-1585792180666-f7347c490ee2?w=500&q=80',
     modelUrl: resolveModelUrl('LG UltraWide Monitor'),
     category: 'Monitors',
+    categoryAr: 'شاشات',
     price: 499.00,
+    originalPrice: 649.00,
     currency: 'USD',
     inStock: true,
     isDemo: true,
+    rating: 4.5,
+    specifications: {
+      Size: '34"',
+      Resolution: '3440 x 1440 UWQHD',
+      'Aspect Ratio': '21:9',
+      Panel: 'IPS',
+    },
+    specificationsAr: {
+      'الحجم': '34 بوصة',
+      'الدقة': '3440 × 1440 UWQHD',
+      'نسبة العرض': '21:9',
+      'اللوحة': 'IPS',
+    },
   },
   {
     id: 'demo-9',
     name: 'Sony Alpha Camera',
-    description: 'Professional mirrorless camera.',
+    nameAr: 'كاميرا سوني ألفا',
+    description: 'Professional mirrorless camera with 61MP full-frame sensor.',
+    descriptionAr: 'كاميرا احترافية بدون مرآة بمستشعر كامل الإطار بدقة 61 ميجابكسل.',
     image: 'https://images.unsplash.com/photo-1516724562728-afc824a36e84?w=500&q=80',
     modelUrl: resolveModelUrl('Sony Alpha Camera'),
     category: 'Cameras',
+    categoryAr: 'كاميرات',
     price: 1999.00,
+    originalPrice: 2299.00,
     currency: 'USD',
     inStock: true,
     isDemo: true,
+    rating: 4.9,
+    specifications: {
+      Sensor: '61MP Full-Frame',
+      'Video': '8K 24p',
+      ISO: '100-32000',
+      Autofocus: '759-point phase detection',
+    },
+    specificationsAr: {
+      'المستشعر': '61 ميجابكسل كامل الإطار',
+      'الفيديو': '8K 24p',
+      'ISO': '100-32000',
+      'التركيز التلقائي': '759 نقطة كشف طوري',
+    },
   },
   {
     id: 'demo-10',
     name: 'PlayStation 5',
-    description: 'Next-gen gaming console.',
+    nameAr: 'بلايستيشن 5',
+    description: 'Next-gen gaming console with ultra-fast SSD and ray tracing.',
+    descriptionAr: 'جهاز ألعاب الجيل الجديد مع SSD فائق السرعة وتتبع الأشعة.',
     image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=500&q=80',
     modelUrl: resolveModelUrl('PlayStation 5'),
     category: 'Gaming',
+    categoryAr: 'ألعاب',
     price: 499.00,
+    originalPrice: 599.00,
     currency: 'USD',
     inStock: true,
     isDemo: true,
+    rating: 4.9,
+    specifications: {
+      CPU: '8-core AMD Zen 2',
+      GPU: 'RDNA 2, 10.28 TFLOPs',
+      Storage: '825GB Custom SSD',
+      Resolution: 'Up to 8K',
+    },
+    specificationsAr: {
+      'المعالج': '8 أنوية AMD Zen 2',
+      'كرت الشاشة': 'RDNA 2, 10.28 TFLOPs',
+      'التخزين': '825 جيجابايت SSD مخصص',
+      'الدقة': 'حتى 8K',
+    },
   }
 ];

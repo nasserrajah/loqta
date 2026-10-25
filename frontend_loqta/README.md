@@ -109,6 +109,12 @@ Products without a matching model are not listed on the storefront, and if a
 model fails to load the page shows the catalog photo plus an explicit
 "3D view unavailable" notice — a static image is never presented as rotatable.
 
+Every product card (home, products, favorites, cart) renders a live,
+auto-rotating 3D preview when the product has a model: the canvas mounts only
+while the card is near the viewport and fades in once the model is framed.
+Only real product photos are displayed otherwise — generated placeholder
+images are never shown.
+
 ---
 
 ## Deployment (Cloudflare Pages)

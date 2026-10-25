@@ -1,4 +1,4 @@
-import { Suspense, useLayoutEffect, useRef, type MutableRefObject } from 'react';
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, type MutableRefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF, Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -11,9 +11,11 @@ interface SceneProps {
   modelUrl: string;
   rotate: boolean;
   loadingLabel: string;
+  interactive: boolean;
+  onReady?: () => void;
 }
 
-function Scene({ modelUrl, rotate, loadingLabel }: SceneProps) {
+function Scene({ modelUrl, rotate, loadingLabel, interactive, onReady }: SceneProps) {
   const invalidate = useThree((state) => state.invalidate);
   // Idle rotation stops as soon as the shopper takes control.
   const interactedRef = useRef(false);
@@ -36,16 +38,24 @@ function Scene({ modelUrl, rotate, loadingLabel }: SceneProps) {
           </Html>
         }
       >
-        <Model url={modelUrl} rotate={rotate} invalidate={invalidate} interactedRef={interactedRef} />
+        <Model
+          url={modelUrl}
+          rotate={rotate}
+          invalidate={invalidate}
+          interactedRef={interactedRef}
+          onReady={onReady}
+        />
       </Suspense>
-      <OrbitControls
-        enablePan={false}
-        makeDefault
-        enableDamping={false}
-        onStart={() => { interactedRef.current = true; }}
-        minDistance={3}
-        maxDistance={10}
-      />
+      {interactive && (
+        <OrbitControls
+          enablePan={false}
+          makeDefault
+          enableDamping={false}
+          onStart={() => { interactedRef.current = true; }}
+          minDistance={3}
+          maxDistance={10}
+        />
+      )}
     </>
   );
 }
@@ -81,15 +91,28 @@ function Model({
   rotate,
   invalidate,
   interactedRef,
+  onReady,
 }: {
   url: string;
   rotate: boolean;
   invalidate: () => void;
   interactedRef: MutableRefObject<boolean>;
+  onReady?: () => void;
 }) {
-  const { scene } = useGLTF(url);
+  const gltf = useGLTF(url);
+  // Clone the cached scene: the same product may be visible in several
+  // canvases at once (home grid + featured row) and a three.js object can
+  // only have one parent.
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const fitRef = useRef<THREE.Group>(null);
   const spinRef = useRef<THREE.Group>(null);
+  const notifiedReady = useRef(false);
+
+  useEffect(() => {
+    if (notifiedReady.current) return;
+    notifiedReady.current = true;
+    onReady?.();
+  }, [onReady]);
 
   useLayoutEffect(() => {
     const fit = fitRef.current;
@@ -155,6 +178,10 @@ export interface Viewer3DProps {
   modelUrl: string;
   loadingLabel: string;
   reducedMotion: boolean;
+  /** Cards render a non-interactive auto-spinning miniature. */
+  interactive?: boolean;
+  /** Fired once the model is loaded and framed — used to fade it in. */
+  onReady?: () => void;
   onFail?: () => void;
 }
 
@@ -165,16 +192,30 @@ export interface Viewer3DProps {
  * frameloop="demand": frames are rendered only on user interaction or while
  * the idle rotation is active — saving GPU work on low-end devices.
  */
-export default function Viewer3D({ modelUrl, loadingLabel, reducedMotion, onFail }: Viewer3DProps) {
+export default function Viewer3D({
+  modelUrl,
+  loadingLabel,
+  reducedMotion,
+  interactive = true,
+  onReady,
+  onFail,
+}: Viewer3DProps) {
   return (
     <Canvas
       frameloop="demand"
+      dpr={[1, 1.5]}
       camera={{ position: [0, 0, 5.5], fov: 45 }}
       // Touch drag rotates the model; vertical swipes still scroll the page.
-      style={{ touchAction: 'pan-y' }}
+      style={{ touchAction: interactive ? 'pan-y' : 'auto' }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
     >
-      <Scene modelUrl={modelUrl} rotate={!reducedMotion} loadingLabel={loadingLabel} />
+      <Scene
+        modelUrl={modelUrl}
+        rotate={!reducedMotion}
+        loadingLabel={loadingLabel}
+        interactive={interactive}
+        onReady={onReady}
+      />
       <ContextLossReporter onFail={onFail} />
     </Canvas>
   );

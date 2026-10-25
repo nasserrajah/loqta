@@ -1,6 +1,7 @@
 import React, { Suspense, useRef, useState, Component, useEffect } from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle, ImageOff, RefreshCw } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
+import { useReducedMotion } from '../../lib/useReducedMotion';
 
 // The heavy three.js / R3F bundle is split into its own chunk and only
 // requested when a 3D view is actually about to render.
@@ -21,22 +22,29 @@ class ModelErrorBoundary extends React.Component<{ fallback: React.ReactNode, ch
 
 interface ViewerProps {
   modelUrl?: string;
-  fallbackImage: string;
+  fallbackImage?: string;
   productName: string;
 }
 
-/** Respects the OS "reduce motion" accessibility preference. */
-function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReduced(query.matches);
-    const listener = (event: MediaQueryListEvent) => setReduced(event.matches);
-    query.addEventListener('change', listener);
-    return () => query.removeEventListener('change', listener);
-  }, []);
-  return reduced;
+/** Real product photo, or a neutral placeholder when no image exists. */
+function FallbackMedia({
+  image,
+  productName,
+  className,
+}: {
+  image?: string;
+  productName: string;
+  className: string;
+}) {
+  if (!image) {
+    return (
+      <div className={`flex items-center justify-center bg-gray-100 text-gray-300 ${className}`}>
+        <ImageOff className="w-12 h-12" aria-hidden="true" />
+        <span className="sr-only">{productName}</span>
+      </div>
+    );
+  }
+  return <img src={image} alt={productName} className={className} loading="lazy" />;
 }
 
 /** Starts true once the viewer has been scrolled into view (micro-optimization: render only near the viewport). */
@@ -81,7 +89,7 @@ export function Product3DViewer({ modelUrl, fallbackImage, productName }: Viewer
     <div ref={containerRef} aria-label={productName} className="w-full h-[400px] bg-gray-50 rounded-xl overflow-hidden relative border border-gray-200">
       {!showViewer ? (
         <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center overflow-hidden relative">
-          <img src={fallbackImage} alt={productName} className="w-full h-full object-cover opacity-80" loading="lazy" />
+          <FallbackMedia image={fallbackImage} productName={productName} className="w-full h-full object-cover opacity-80" />
           {modelUrl && !hasFailed ? (
             <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white p-4 text-center pointer-events-none">
               <div className="w-8 h-8 border-4 border-white/60 border-t-transparent rounded-full animate-spin mb-2" aria-hidden="true" />
@@ -142,10 +150,10 @@ export function Product3DViewer({ modelUrl, fallbackImage, productName }: Viewer
   );
 }
 
-function FallbackImageOverlay({ image, productName, loadingLabel }: { image: string; productName: string; loadingLabel: string }) {
+function FallbackImageOverlay({ image, productName, loadingLabel }: { image?: string; productName: string; loadingLabel: string }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center">
-      <img src={image} alt={productName} className="absolute inset-0 w-full h-full object-cover opacity-60" loading="lazy" />
+      <FallbackMedia image={image} productName={productName} className="absolute inset-0 w-full h-full object-cover opacity-60" />
       <div className="relative flex flex-col items-center">
         <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mb-2" aria-hidden="true" />
         <p className="text-sm font-medium text-white">{loadingLabel}</p>

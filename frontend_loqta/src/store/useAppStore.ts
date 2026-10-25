@@ -34,7 +34,7 @@ interface AppState {
   toggleFavorite: (id: string) => void;
 
   cart: CartItem[];
-  addToCart: (id: string) => void;
+  addToCart: (id: string, product?: Product) => void;
   decreaseQuantity: (id: string) => void;
   removeFromCart: (id: string) => void;
 }
@@ -125,7 +125,7 @@ export const useAppStore = create<AppState>()(
       },
 
       cart: [],
-      addToCart: async (id) => {
+      addToCart: async (id, product) => {
         if (get().user && !isDemoId(id)) {
           try {
             const response = await cartService.addItem(id);
@@ -138,9 +138,15 @@ export const useAppStore = create<AppState>()(
         set((state) => {
           const existing = state.cart.find(item => item.id === id);
           if (existing) {
-            return { cart: state.cart.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item) };
+            return {
+              cart: state.cart.map(item =>
+                item.id === id
+                  ? { ...item, quantity: item.quantity + 1, product: item.product ?? product }
+                  : item
+              ),
+            };
           }
-          return { cart: [...state.cart, { id, quantity: 1 }] };
+          return { cart: [...state.cart, { id, quantity: 1, product }] };
         });
       },
       decreaseQuantity: async (id) => {

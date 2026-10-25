@@ -1,10 +1,22 @@
 import { Product } from '../data/demoProducts';
 import { resolveModelUrl } from '../data/modelRegistry';
+import { isDisplayableImage } from './images';
+
+/** Picks the primary image the API really provides (never a generated one). */
+function pickImage(item: any): string {
+  const candidates = [
+    item.primaryImageUrl,
+    item.imageUrl,
+    ...(Array.isArray(item.images) ? item.images.map((image: any) => image?.url) : []),
+  ];
+  const found = candidates.find((url) => isDisplayableImage(url));
+  return typeof found === 'string' ? found : '';
+}
 
 export function mapBackendProduct(item: any): Product {
   let specifications: Record<string, string> | null = null;
+  let specificationsAr: Record<string, string> | undefined = undefined;
   if (item.specifications) {
-    // The backend can send specifications either as JSON text or as an object.
     if (typeof item.specifications === 'string') {
       try {
         specifications = JSON.parse(item.specifications);
@@ -15,6 +27,10 @@ export function mapBackendProduct(item: any): Product {
       specifications = item.specifications;
     }
   }
+  // Optional Arabic specifications if provided by backend
+  if (item.specificationsAr && typeof item.specificationsAr === 'object') {
+    specificationsAr = item.specificationsAr;
+  }
 
   const modelUrl =
     item.modelUrl ||
@@ -23,7 +39,6 @@ export function mapBackendProduct(item: any): Product {
     item.glbUrl ||
     item.gltfUrl ||
     item.assetUrl ||
-    // Fall back to a locally-dropped GLB matched by product name.
     resolveModelUrl(item.name ?? '') ||
     undefined;
 
@@ -31,14 +46,20 @@ export function mapBackendProduct(item: any): Product {
     id: item.id,
     slug: item.slug,
     name: item.name,
+    nameAr: item.nameAr ?? item.name_ar ?? undefined,
     description: item.description || 'No description available.',
-    image: item.primaryImageUrl || 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80',
+    descriptionAr: item.descriptionAr ?? item.description_ar ?? undefined,
+    image: pickImage(item),
     modelUrl,
     category: item.category?.name || 'General',
+    categoryAr: item.category?.nameAr ?? item.category?.name_ar ?? undefined,
     price: parseFloat(item.price) || 0,
     currency: item.currency || 'USD',
+    originalPrice: item.originalPrice ? parseFloat(item.originalPrice) : undefined,
     inStock: item.inStock ?? item.stockQuantity > 0,
     isDemo: false,
+    rating: typeof item.rating === 'number' ? item.rating : undefined,
     specifications: specifications ?? undefined,
+    specificationsAr,
   };
 }

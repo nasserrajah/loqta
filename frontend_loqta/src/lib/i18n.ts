@@ -1,21 +1,52 @@
 export const dictionary = {
   en: {
+    // Navigation
     home: 'Home',
     products: 'Products',
     categories: 'Categories',
+    deals: 'Deals & Offers',
+    delivery: 'Delivery',
     cart: 'Cart',
     favorites: 'Favorites',
     login: 'Login',
     logout: 'Logout',
     profile: 'Profile',
     search: 'Search products...',
-    heroTitle: 'Discover the Future of Tech',
-    heroSubtitle: 'Premium electronics curated for you.',
+    searchPlaceholder: 'Search by product name...',
+    // Hero
+    heroTitle: 'Bringing the Market to Your Doorstep',
+    heroSubtitle: 'Premium electronics curated for you — inspected in immersive 3D before you buy.',
     shopNow: 'Shop Now',
+    // Sections
+    shopByCategories: 'Shop by categories',
+    weeklyPopular: 'Weekly Popular Products',
+    getUpTo70: 'Get Up to 70% Off',
+    todayBestDeals: "Today's Best Deal For You!",
+    bestselling: 'Bestselling',
+    newArrivals: 'New Arrivals',
+    brands: 'Brands',
+    seeAll: 'See All',
+    get10Cashback: 'Get 10% Cashback On Your First Order',
+    learnMore: 'Learn More',
+    whatClientsSay: 'What Our Client Say About Us',
+    servicesTitle: 'Services To Help You Shop!',
+    newsletter: 'Subscribe Newsletters',
+    newsletterDesc: 'Get the latest updates and exclusive offers',
+    emailPlaceholder: 'Enter your email',
+    subscribeNow: 'Subscribe Now',
+    // Services
+    faqService: 'Frequently Asked Question',
+    paymentService: 'Online Payment Process',
+    deliveryService: 'Home Delivery Options',
+    // Product
     priceUnavailable: 'Price unavailable',
     addToCart: 'Add to Cart',
     outOfStock: 'Out of Stock',
+    inStock: 'In Stock',
+    outOfStockStatus: 'Out of Stock',
     demoDataNotice: 'Demo Data',
+    save: 'Save',
+    // 3D
     resetView: 'Reset 3D View',
     loading3d: 'Loading 3D Model...',
     fallback3d: '3D view unavailable.',
@@ -43,10 +74,8 @@ export const dictionary = {
     loadingProduct: 'Loading product details...',
     productNotFound: 'Product not found',
     backToProducts: 'Back to Products',
-    inStock: 'In Stock',
-    outOfStockStatus: 'Out of Stock',
     qty: 'Qty',
-    // Login
+    // Auth
     loginError: 'Invalid email or password',
     signingIn: 'Signing in...',
     welcomeBack: 'Welcome back to Loqta',
@@ -54,7 +83,6 @@ export const dictionary = {
     noAccount: "Don't have an account?",
     createAccount: 'Create an account',
     forgotPassword: 'Forgot password?',
-    // Register
     register: 'Create Account',
     registerTitle: 'Join Loqta',
     registerSubtitle: 'Create an account to save favorites and sync your cart.',
@@ -69,7 +97,6 @@ export const dictionary = {
     creatingAccount: 'Creating account...',
     registerError: 'Registration failed. The email may already be in use.',
     alreadyHaveAccount: 'Already have an account?',
-    // Forgot password
     forgotPasswordTitle: 'Reset your password',
     forgotPasswordSubtitle: 'Enter your email and we will send you a reset link if the account exists.',
     sendResetLink: 'Send reset link',
@@ -80,7 +107,7 @@ export const dictionary = {
     resetPasswordSubtitle: 'Enter the code from your email and choose a new password.',
     resetTokenLabel: 'Reset code',
     resetTokenPlaceholder: 'Paste the code from your email',
-    resetTokenHint: 'Copy the code from the email we sent you — it looks like BtwyOSRQN8XguG7ge-dPC26l...',
+    resetTokenHint: 'Copy the code from the email we sent you.',
     resetPassword: 'Reset password',
     resetting: 'Resetting...',
     resetPasswordSuccess: 'Your password has been reset successfully. Redirecting to login...',
@@ -96,7 +123,6 @@ export const dictionary = {
     pageNotFoundDesc: "The page you're looking for doesn't exist or has been moved.",
     backToLogin: 'Back to login',
     // Products page
-    searchPlaceholder: 'Search by product name...',
     filterByCategory: 'Category',
     sort: 'Sort',
     sortNewest: 'Newest first',
@@ -126,7 +152,7 @@ export const dictionary = {
     profileUpdateError: 'Could not update your profile.',
     memberSince: 'Member since',
     requireLogin: 'Please login to view this page.',
-    // Navbar & misc
+    // Misc
     menu: 'Menu',
     close: 'Close',
     viewAll: 'View all',
@@ -143,26 +169,61 @@ export const dictionary = {
     footerTagline: 'Curated electronics, inspected in 3D.',
     footerRights: 'All rights reserved.',
     footerLinks: 'Quick Links',
+    footerAbout: 'About us',
+    footerContact: 'Contact',
+    footerExplore: 'Explore',
+    footerDelivery: 'Delivery',
     backToHome: 'Back to Home',
     demoNotice: 'Demo mode — showing sample data because the backend is unreachable.',
   },
   ar: {
+    // Navigation
     home: 'الرئيسية',
     products: 'المنتجات',
     categories: 'التصنيفات',
+    deals: 'العروض والتخفيضات',
+    delivery: 'التوصيل',
     cart: 'السلة',
     favorites: 'المفضلة',
     login: 'تسجيل الدخول',
     logout: 'تسجيل الخروج',
     profile: 'الملف الشخصي',
     search: 'ابحث عن المنتجات...',
-    heroTitle: 'اكتشف مستقبل التقنية',
-    heroSubtitle: 'إلكترونيات متميزة مختارة بعناية لك.',
+    searchPlaceholder: 'ابحث باسم المنتج...',
+    // Hero
+    heroTitle: 'نجلب لك السوق إلى باب منزلك',
+    heroSubtitle: 'إلكترونيات فاخرة مختارة بعناية — افحصها بالمجسم ثلاثي الأبعاد قبل الشراء.',
     shopNow: 'تسوق الآن',
+    // Sections
+    shopByCategories: 'تسوق حسب التصنيف',
+    weeklyPopular: 'منتجات الأسبوع الأكثر رواجاً',
+    getUpTo70: 'خصم يصل إلى 70%',
+    todayBestDeals: 'أفضل العروض اليوم من أجلك!',
+    bestselling: 'الأكثر مبيعاً',
+    newArrivals: 'وصل حديثاً',
+    brands: 'الماركات',
+    seeAll: 'عرض الكل',
+    get10Cashback: 'احصل على 10% كاش باك على أول طلب',
+    learnMore: 'اعرف المزيد',
+    whatClientsSay: 'ماذا يقول عملاؤنا عنا',
+    servicesTitle: 'خدمات لتساعدك على التسوق!',
+    newsletter: 'اشترك في النشرة البريدية',
+    newsletterDesc: 'احصل على آخر التحديثات والعروض الحصرية',
+    emailPlaceholder: 'أدخل بريدك الإلكتروني',
+    subscribeNow: 'اشترك الآن',
+    // Services
+    faqService: 'الأسئلة الشائعة',
+    paymentService: 'عملية الدفع الإلكتروني',
+    deliveryService: 'خيارات التوصيل للمنزل',
+    // Product
     priceUnavailable: 'السعر غير متوفر',
     addToCart: 'أضف إلى السلة',
     outOfStock: 'غير متوفر',
+    inStock: 'متوفر',
+    outOfStockStatus: 'غير متوفر',
     demoDataNotice: 'بيانات تجريبية',
+    save: 'وفّر',
+    // 3D
     resetView: 'إعادة ضبط العرض',
     loading3d: 'جاري تحميل المجسم...',
     fallback3d: 'العرض ثلاثي الأبعاد غير متاح.',
@@ -190,10 +251,8 @@ export const dictionary = {
     loadingProduct: 'جاري تحميل تفاصيل المنتج...',
     productNotFound: 'المنتج غير موجود',
     backToProducts: 'العودة للمنتجات',
-    inStock: 'متوفر',
-    outOfStockStatus: 'غير متوفر',
     qty: 'الكمية',
-    // Login
+    // Auth
     loginError: 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
     signingIn: 'جاري تسجيل الدخول...',
     welcomeBack: 'مرحباً بعودتك إلى لقطة',
@@ -201,7 +260,6 @@ export const dictionary = {
     noAccount: 'ليس لديك حساب؟',
     createAccount: 'إنشاء حساب',
     forgotPassword: 'نسيت كلمة المرور؟',
-    // Register
     register: 'إنشاء حساب',
     registerTitle: 'انضم إلى لقطة',
     registerSubtitle: 'أنشئ حساباً لحفظ المفضلة ومزامنة سلتك.',
@@ -216,7 +274,6 @@ export const dictionary = {
     creatingAccount: 'جاري إنشاء الحساب...',
     registerError: 'فشل إنشاء الحساب. قد يكون البريد الإلكتروني مستخدماً بالفعل.',
     alreadyHaveAccount: 'لديك حساب بالفعل؟',
-    // Forgot password
     forgotPasswordTitle: 'إعادة تعيين كلمة المرور',
     forgotPasswordSubtitle: 'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين إن كان الحساب موجوداً.',
     sendResetLink: 'إرسال رابط إعادة التعيين',
@@ -227,7 +284,7 @@ export const dictionary = {
     resetPasswordSubtitle: 'أدخل الرمز الموجود في الإيميل ثم اختر كلمة المرور الجديدة.',
     resetTokenLabel: 'رمز إعادة التعيين',
     resetTokenPlaceholder: 'الصق الرمز من الإيميل هنا',
-    resetTokenHint: 'انسخ الرمز من الإيميل الذي وصلك — يشبه BtwyOSRQN8XguG7ge-dPC26l...',
+    resetTokenHint: 'انسخ الرمز من الإيميل الذي وصلك.',
     resetPassword: 'إعادة تعيين كلمة المرور',
     resetting: 'جاري الإعادة...',
     resetPasswordSuccess: 'تم إعادة تعيين كلمة المرور بنجاح. سيتم تحويلك لتسجيل الدخول...',
@@ -243,7 +300,6 @@ export const dictionary = {
     pageNotFoundDesc: 'الصفحة التي تبحث عنها غير موجودة أو تم نقلها.',
     backToLogin: 'العودة لتسجيل الدخول',
     // Products page
-    searchPlaceholder: 'ابحث باسم المنتج...',
     filterByCategory: 'التصنيف',
     sort: 'الترتيب',
     sortNewest: 'الأحدث أولاً',
@@ -273,7 +329,7 @@ export const dictionary = {
     profileUpdateError: 'تعذر تحديث الملف الشخصي.',
     memberSince: 'عضو منذ',
     requireLogin: 'يرجى تسجيل الدخول لعرض هذه الصفحة.',
-    // Navbar & misc
+    // Misc
     menu: 'القائمة',
     close: 'إغلاق',
     viewAll: 'عرض الكل',
@@ -290,6 +346,10 @@ export const dictionary = {
     footerTagline: 'إلكترونيات مختارة، يُفحص عرضها ثلاثي الأبعاد.',
     footerRights: 'جميع الحقوق محفوظة.',
     footerLinks: 'روابط سريعة',
+    footerAbout: 'من نحن',
+    footerContact: 'تواصل معنا',
+    footerExplore: 'استكشف',
+    footerDelivery: 'التوصيل',
     backToHome: 'العودة للرئيسية',
     demoNotice: 'وضع تجريبي — نعرض بيانات عينة نظراً لعدم إمكانية الوصول للخادم.',
   }
@@ -297,3 +357,12 @@ export const dictionary = {
 
 export type Language = 'en' | 'ar';
 export type TranslationKey = keyof typeof dictionary.en;
+
+/** Helper to pick localized field */
+export function pickLocalized<T>(
+  language: Language,
+  en: T,
+  ar?: T
+): T {
+  return language === 'ar' && ar !== undefined && ar !== null && (ar as any) !== '' ? ar : en;
+}
