@@ -1,30 +1,26 @@
 # دليل نشر متجر لُقطة — Deploy Guide
 
-دليل خطوة بخطوة لنشر الموقع بالكامل: **الواجهة على Cloudflare Pages** + **الـ API على Render** + **البريد عبر Resend**.
+دليل خطوة بخطوة لنشر الموقع بالكامل: **الواجهة على Vercel** + **الـ API على Render** + **البريد عبر Resend**.
 تنبيه: لا تشارك أي مفاتيح (API Keys) في المحادثات أو المستودع — تُضبط فقط في لوحات التحكم.
 
 ---
 
-## الخطوة 1 — نشر الواجهة الأمامية على Cloudflare Pages
+## الخطوة 1 — نشر الواجهة الأمامية على Vercel ✅ (تمت)
 
-1. ادخل على [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages → Create → Pages → Connect to Git**.
-2. اختر مستودع `nasserrajah/loqta` (فرع `main`).
-3. الإعدادات:
-   - **Project root / Root directory:** `frontend_loqta`
-   - **Framework preset:** `Vite` (أو None)
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-4. قبل أول بناء، افتح **Settings → Environment variables** وأضف (للإنتاج و preview معًا):
+النطاق الحالي: **https://loqta-store-virid.vercel.app/**
 
-   | الاسم | القيمة |
-   |---|---|
-   | `VITE_API_BASE_URL` | `https://loqta-feto.onrender.com/api/v1` |
+ما هو منجز تلقائيًا مع المستودع:
+- ملف `frontend_loqta/vercel.json` يعيد توجيه أي مسار داخلي إلى `index.html` (بدونه الروابط مثل `/products` ورابط إعادة تعيين كلمة المرور من الإيميل ترجع 404 — Vercel لا يقرأ ملف `_redirects` الخاص بـ Cloudflare).
+- وسوم المشاركة (`og:image` وغيرها) مضبوطة على النطاق أعلاه. إذا غيّرت النطاق لاحقًا (دومين مخصص) حدّث `og:url` و`og:image` في `frontend_loqta/index.html`.
 
-   > المتغير يُقرأ وقت البناء — لو تغيّر لاحقًا يجب إعادة النشر (Redeploy).
-5. اضغط **Save and Deploy**. بعد الدقيقة ستحصل على رابط مثل `https://loqta-XXXX.pages.dev` — **احفظه**، ستحتاجه في الخطوتين 2 و3.
-6. تحقّق بعد النشر:
-   - الصفحة الرئيسية تعمل وتظهر منتجات 3D.
-   - تحديث أي صفحة داخلية (مثل `/products`) لا يعطي 404 — ملف `_redirects` موجود ومسؤول عن ذلك.
+خطوات لو احتجت إعادة النشر أو نشر نسخة جديدة:
+1. [vercel.com](https://vercel.com) → **Add New → Project** → استورد `nasserrajah/loqta`.
+2. **Root Directory:** `frontend_loqta` — إطار العمل يُكتشف تلقائيًا (Vite).
+3. في **Environment Variables** أضف (اختياري — يوجد افتراضي صحيح في الكود):
+   - `VITE_API_BASE_URL` = `https://loqta-feto.onrender.com/api/v1`
+4. **Deploy** — وكل push جديد على `main` يُنشر تلقائيًا.
+
+> بديل: Cloudflare Pages — في هذه الحالة احذف `vercel.json` وأبقِ `public/_redirects` (الموجود مسبقًا).
 
 ---
 
@@ -34,8 +30,8 @@
 
 | الاسم | القيمة | ملاحظة |
 |---|---|---|
-| `CORS_ORIGINS` | `http://localhost:5181,http://localhost:5182,https://YOUR-PAGES-URL.pages.dev` | **أضف رابط Cloudflare** بدون شرطة مائلة في النهاية. الكود يرفض `*` في الإنتاج |
-| `APP_URL` | `https://YOUR-PAGES-URL.pages.dev` | يُستخدم لبناء روابط إعادة تعيين كلمة المرور |
+| `CORS_ORIGINS` | `http://localhost:5181,http://localhost:5182,https://loqta-store-virid.vercel.app` | **أضف رابط Vercel** بدون شرطة مائلة في النهاية. الكود يرفض `*` في الإنتاج |
+| `APP_URL` | `https://loqta-store-virid.vercel.app` | يُستخدم لبناء روابط إعادة تعيين كلمة المرور |
 | `EMAIL_FROM` | `Loqta <onboarding@resend.dev>` | مرسل البريد. بدّله لاحقًا بدومين موثّق (الخطوة 3) |
 | `RESEND_API_KEY` | المفتاح الجديد | **دوّر المفتاح القديم** (انكشف سابقًا) من [resend.com/api-keys](https://resend.com/api-keys) |
 
@@ -57,7 +53,7 @@
 5. (اختياري لكن مهم للهوية) اربط الدومين بالواجهة:
    - Cloudflare Pages → **Custom domains** → أضف `www.loqta-store.com` واتبع تعليمات DNS.
    - بعدها حدّث `CORS_ORIGINS` و`APP_URL` في Render بالدومين الجديد وأعد النشر.
-6. (اختياري — تحسين مشاركة الروابط) بعد معرفة النطاق النهائي، حدّث في `frontend_loqta/index.html` وسمَي `og:url`/`og:image` إلى رابط مطلق مثل `https://loqta-store.com/og-image.png` وأعد النشر.
+6. (اختياري — تحسين مشاركة الروابط) وسوم المشاركة مضبوطة حاليًا على `https://loqta-store-virid.vercel.app` في `frontend_loqta/index.html` — حدّثها فقط إذا غيّرت النطاق.
 
 ---
 
@@ -87,14 +83,14 @@
 ## ملخص سريع (للصق في الملاحظات)
 
 ```
-1) Cloudflare Pages:  repo=loqta, root=frontend_loqta, build=npm run build, out=dist
-   env: VITE_API_BASE_URL=https://loqta-feto.onrender.com/api/v1
-2) Render env:        CORS_ORIGINS += https://<pages-url>   (بدون / بالنهاية)
-                      APP_URL=https://<pages-url>
-                      EMAIL_FROM=Loqta <onboarding@resend.dev>
-                      RESEND_API_KEY=<مفتاح جديد بعد تدوير القديم>
-                      ثم Manual Deploy
-3) Resend:            تدوير المفتاح + توثيق دومين + DNS (SPF/DKIM) + تحديث EMAIL_FROM
-4) UptimeRobot:       ping /api/v1/health كل 10 دقائق
+1) Vercel (تمت):       https://loqta-store-virid.vercel.app
+                       root=frontend_loqta, vercel.json يتكفل بالراوتر
+2) Render env:         CORS_ORIGINS += https://loqta-store-virid.vercel.app   (بدون / بالنهاية)
+                       APP_URL=https://loqta-store-virid.vercel.app
+                       EMAIL_FROM=Loqta <onboarding@resend.dev>
+                       RESEND_API_KEY=<مفتاح جديد بعد تدوير القديم>
+                       ثم Manual Deploy
+3) Resend:             تدوير المفتاح + توثيق دومين + DNS (SPF/DKIM) + تحديث EMAIL_FROM
+4) UptimeRobot:        ping /api/v1/health كل 10 دقائق
 5) اختبر قائمة التحقق أعلاه
 ```
